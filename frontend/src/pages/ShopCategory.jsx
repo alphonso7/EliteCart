@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { ShopContext } from '../Context/ShopContext'
 import dropdown_icon from '../assets/dropdown_icon.png'
 import Item from '../components/Item'
+import Footer from '../components/Footer'
 
 const ShopCategory = (props) => {
   const {all_products} = useContext(ShopContext)
@@ -31,6 +32,7 @@ const ShopCategory = (props) => {
           }
         })}
       </div>
+      <Footer/>
     </div>
     
   )

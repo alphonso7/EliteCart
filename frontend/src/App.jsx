@@ -15,7 +15,7 @@ function App() {
 
   return (
     <>
-      <div>
+      <div className='w-100 sm:w-auto md:w-auto' >
         <BrowserRouter>
         <Navbar/>
         <Routes>

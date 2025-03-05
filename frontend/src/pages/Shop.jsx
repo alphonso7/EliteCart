@@ -3,6 +3,8 @@ import Banner from '../components/Banner'
 import Popular from '../components/Popular'
 import Newsletter from '../components/Newsletter'
 import Footer from '../components/Footer'
+import NewCollections from '../components/NewCollections'
+import home_banner from '../assets/home_banner.jpg'
 
 const Shop = () => {
   return (
@@ -19,6 +21,8 @@ const Shop = () => {
         </section> */}
         <Banner/>
         <Popular/>
+        <img src={home_banner} alt="home_banner" className="h-auto w-full" />
+        <NewCollections/>
         <Newsletter/>
         <Footer/>
       
