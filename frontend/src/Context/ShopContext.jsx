@@ -1,11 +1,11 @@
 import React, { createContext, useState, useEffect } from "react";
-import all_products from '../assets/all_product'
+// import all_products from '../assets/all_product'
 import Product from "../pages/Product";
 
 export const ShopContext = createContext(null)
 const getDefaultCart = ()=>{
     let cart = {}
-    for (let i = 0; i < all_products.length; i++) {
+    for (let i = 0; i < 300+1; i++) {
         cart[i] = 0;
         
     }
@@ -13,11 +13,21 @@ const getDefaultCart = ()=>{
 }
 
 const ShopContextProvider = (props) =>{
+
+    const [all_products, setAllProduct] = useState([]);
+
     const [cartItems, setcartItems] = useState(()=>{
         const savedCart = localStorage.getItem("cartItems");
         return savedCart ? JSON.parse(savedCart) : getDefaultCart();
     }   
     );
+
+    useEffect(()=>{
+        fetch('http://localhost:3000/allproducts')
+        .then((resp) => resp.json())
+        .then((data) => {setAllProduct(data)});
+    },[]);
+  
 
     useEffect(() => {
         localStorage.setItem("cartItems", JSON.stringify(cartItems));

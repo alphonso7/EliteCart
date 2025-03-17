@@ -30,7 +30,10 @@ const Navbar = () => {
           <a href="#" className="hover:text-black">Wishlist (0)</a>
           <Link to={'/Cart'} className="hover:text-black" >Cart({getTotalCartItems()})</Link>
           {/* <a href="#" className="hover:text-black">Cart (0)</a> */}
-          <a href="#" className="hover:text-black">Sign In</a>
+          {/* <a href="#" className="hover:text-black">Sign In</a> */}
+
+          {localStorage.getItem('auth-token')? <button onClick={()=> {localStorage.removeItem('auth-token'); window.location.replace('/')}} >Logout</button>: <Link to={'/signup'} className='hover:text-black' >Login</Link>}
+          
           {/* <FiSearch className="text-xl cursor-pointer hover:text-black" /> */}
         </div>
       </div>
