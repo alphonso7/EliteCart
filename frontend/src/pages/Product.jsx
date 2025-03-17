@@ -12,7 +12,7 @@ const Product = () => {
   const product = all_products.find((e) => e.id===Number(ProductId))
   return (
     <div >
-      <Breadcrumb product={product.name} />
+      <Breadcrumb product_name={product.name} />
       {/* <img src={product.image} alt="" />- */}
       <ProductDisplay productId = {ProductId} productName= {product.name} productOldPrice = {product.oldPrice} productNewPrice = {product.newPrice} productImage = {product.image} />
       <RelatedProducts/>

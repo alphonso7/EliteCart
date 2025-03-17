@@ -204,6 +204,26 @@ app.post('/login', async(req, res) =>{
     }
 })
 
+//creating endpoint for newCollection data
+app.get('/newCollections', async(req, res) =>{
+    let products = await Product.find({});
+    let newCollection  = products.slice(1).slice(-8);
+    console.log("New Collection fecthed");
+    res.send(newCollection);
+})
+
+//creatign endpoitn for popular in women
+app.get('/popularInWomen', async(req, res) =>{
+    let products = await Product.find({category: "women"});
+    let popular_in_women  = products.slice(0,4);
+    console.log("POpulalr in women fecthed");
+    res.send(popular_in_women);
+})
+
+//creating endpoint for adding products in cart
+app.post('/addToCart', async(req, res) =>{
+    console.log(req.body);
+})
 
 app.listen(process.env.PORT, (error) =>{
     if(!error){
