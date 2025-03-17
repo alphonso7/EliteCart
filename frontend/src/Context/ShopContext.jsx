@@ -13,11 +13,21 @@ const getDefaultCart = ()=>{
 }
 
 const ShopContextProvider = (props) =>{
+
+    // const [all_products, setAllProduct] = useState([]);
+
     const [cartItems, setcartItems] = useState(()=>{
         const savedCart = localStorage.getItem("cartItems");
         return savedCart ? JSON.parse(savedCart) : getDefaultCart();
     }   
     );
+
+    // useEffect(()=>{
+    //     fetch('http://localhost:3000/allproducts')
+    //     .then((resp) => resp.json())
+    //     .then((data) => {setAllProduct(data)});
+    // },[]);
+  
 
     useEffect(() => {
         localStorage.setItem("cartItems", JSON.stringify(cartItems));

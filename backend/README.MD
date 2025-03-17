@@ -7,6 +7,7 @@ npm i cors
 npm i jsonwebtoken
 npm i multer
 npm i dotenv
+npm i bcrypt
 
 
 ```

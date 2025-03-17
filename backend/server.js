@@ -1,12 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
-// const axios = require("axios");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt')
 const path = require("path");
 const { type } = require("os");
-const Product = require('./models/Product')
+const Product = require('./models/Product');
+const Users = require("./models/Users");
 
 require('dotenv').config()
 
@@ -138,12 +139,68 @@ app.post('/removeproduct', async (req, res) => {
 app.get('/allproducts', async(req, res)=>{
     try{
         let products = await Product.find({});
-        console.log("All Products fetch");
+        // console.log("All Products fetch");
         res.send(products);
     }
     catch{
         console.log(error);
         res.status(500).json({message: "NOt found"});
+    }
+})
+
+
+//Creating endpoint for registering user
+app.post('/signup', async(req, res) =>{
+    let check = await Users.findOne({email:req.body.email});
+    if (check){
+        res.status(400).json({success:false, errors: "Existing user found with same email address"});
+    }
+    let cart = {};
+    for(let i =0 ; i<300; i++){
+        cart[i] = 0;
+    }
+    // const salt = await bcrypt.genSalt(10);
+    // const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const user = new Users({
+        name: req.body.username,
+        email: req.body.email,
+        password:req.body.password,
+        cartData: cart,
+    })
+    await user.save();
+    const data = {
+        user:{
+            id:user.id
+        }
+    }
+    const token = jwt.sign(data, 'secret_ecom');
+    res.json({success:true, token})
+})
+
+//creating endpoint for user login
+app.post('/login', async(req, res) =>{
+    let user = await Users.findOne({email:req.body.email});
+    // console.log(user)
+    if (user){
+        // console.log(req.body.password);
+        // console.log(user.password)
+        // const passCompare = await bcrypt.compare(req.body.password, user.password);
+        const passCompare = (req.body.password === user.password);
+        if(passCompare){
+            const data = {
+                user: {
+                    id:user.id
+                }
+            }
+            const token  = jwt.sign(data, 'secret_ecom')
+            res.json({success:true, token});
+        }
+        else{
+            res.json({success:false, errors:"Wrong password"});
+        }
+    }
+    else{
+        res.json({success:false, errors:"Wrong EmailId"})
     }
 })
 
