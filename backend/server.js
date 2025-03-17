@@ -5,9 +5,10 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt')
 const path = require("path");
-const { type } = require("os");
 const Product = require('./models/Product');
 const Users = require("./models/Users");
+const Order = require('./models/Order')
+const authMiddleware = require("./middleware/authMiddleware");
 
 require('dotenv').config()
 
@@ -143,7 +144,7 @@ app.get('/allproducts', async(req, res)=>{
         res.send(products);
     }
     catch{
-        console.log(error);
+        console.error("Error fetching products:", error);
         res.status(500).json({message: "NOt found"});
     }
 })
@@ -224,6 +225,50 @@ app.get('/popularInWomen', async(req, res) =>{
 app.post('/addToCart', async(req, res) =>{
     console.log(req.body);
 })
+
+// for order list display
+app.get("/orders", async (req, res) => {
+    try {
+        const userId = req.user.id; // Assuming user is authenticated via token
+        const orders = await Order.find({ userId }).populate("items.productId", "name image new_price");
+        res.json(orders);
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).json({ message: "Failed to fetch orders" });
+    }
+});
+
+//to create order for user
+app.post("/create-order", authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id;  
+        const { cartItems } = req.body;
+
+        if (!cartItems || Object.keys(cartItems).length === 0) {
+            return res.status(400).json({ message: "Cart is empty" });
+        }
+
+        const orderItems = Object.keys(cartItems).map((productId) => ({
+            productId,
+            quantity: cartItems[productId],
+        }));
+
+        const totalAmount = orderItems.reduce((total, item) => total + item.quantity * 10, 0); // Replace `10` with actual product price logic
+
+        const newOrder = new Order({
+            userId,
+            items: orderItems,
+            totalAmount,
+            status: "Processing",
+        });
+
+        await newOrder.save();
+        res.json({ success: true, order: newOrder });
+    } catch (error) {
+        console.error("Error creating order:", error);
+        res.status(500).json({ message: "Failed to create order" });
+    }
+});
 
 app.listen(process.env.PORT, (error) =>{
     if(!error){

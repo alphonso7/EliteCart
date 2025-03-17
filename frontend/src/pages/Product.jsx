@@ -7,9 +7,16 @@ import RelatedProducts from '../components/RelatedProducts'
 import Footer from '../components/Footer'
 
 const Product = () => {
-  const {all_products} = useContext(ShopContext)
-  const {ProductId} = useParams()
-  const product = all_products.find((e) => e.id===Number(ProductId))
+  const {all_products} = useContext(ShopContext);
+  const {ProductId} = useParams();
+  const product = all_products.find((e) => Number(e.id)===Number(ProductId))
+  if (!all_products.length) {
+    return <p>Loading products...</p>;
+  }
+
+  if (!product) {
+    return <p>Product not found</p>;
+  }
   return (
     <div >
       <Breadcrumb product_name={product.name} />

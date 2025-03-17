@@ -3,6 +3,9 @@ import React, { createContext, useState, useEffect } from "react";
 import Product from "../pages/Product";
 
 export const ShopContext = createContext(null)
+
+
+
 const getDefaultCart = ()=>{
     let cart = {}
     for (let i = 0; i < 300+1; i++) {
@@ -14,6 +17,9 @@ const getDefaultCart = ()=>{
 
 const ShopContextProvider = (props) =>{
 
+    const [searchQuery, setSearchQuery] = useState("");
+
+
     const [all_products, setAllProduct] = useState([]);
 
     const [cartItems, setcartItems] = useState(()=>{
@@ -22,11 +28,22 @@ const ShopContextProvider = (props) =>{
     }   
     );
 
-    useEffect(()=>{
+    useEffect(() => {
         fetch('http://localhost:3000/allproducts')
-        .then((resp) => resp.json())
-        .then((data) => {setAllProduct(data)});
-    },[]);
+            .then((resp) => resp.json())
+            .then((data) => {
+                setAllProduct(data);
+                console.log(data)
+            })
+            .catch((err) => console.error("Fetch error:", err));
+    }, []);
+
+    const filteredProducts = searchQuery.trim()
+    ? all_products.filter((product) =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    : []; 
+
   
 
     useEffect(() => {
@@ -78,7 +95,7 @@ const ShopContextProvider = (props) =>{
         return totItems;
     }
 
-    const contextValue = {all_products, cartItems, addToCart, removeFromCart, getTotalCartAmount, getTotalCartItems};
+    const contextValue = {all_products, cartItems, addToCart, removeFromCart, getTotalCartAmount, getTotalCartItems, filteredProducts, searchQuery, setSearchQuery};
 
 
 
