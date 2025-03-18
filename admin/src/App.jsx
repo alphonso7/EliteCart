@@ -1,5 +1,6 @@
-import Admin from './pages/admin'
+import Admin from './pages/Admin'
 import Navbar from './components/Navbar'
+import AdminOrders from './components/AdminOrders'
 
 function App() {
 
@@ -7,6 +8,7 @@ function App() {
     <>
       <Navbar/>
       <Admin/>
+      
 
     </>
   )

@@ -3,12 +3,11 @@ const cors = require("cors");
 const multer = require("multer");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 const path = require("path");
 const Product = require("./models/Product");
 const Users = require("./models/Users");
 const Order = require("./models/Order");
-
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
 
@@ -16,8 +15,34 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true })); // ✅ Ensures form data is parsed correctly
+app.use(cookieParser());
 
 const authMiddleware = require("./middleware/authMiddleware");
+const adminMiddleware = require('./middleware/adminMiddleware');
+
+
+const allowedOrigins = ["http://localhost:5000", "http://localhost:4000"];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, origin);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true // ✅ Allows cookies and authorization headers
+}));
+app.options("*", cors()); 
+
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", req.headers.origin); // ✅ Dynamically set allowed origin
+//     res.header("Access-Control-Allow-Credentials", "true"); // ✅ Required for credentials
+//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//     res.header("Access-Control-Allow-Headers", "Content-Type, auth-token");
+//     next();
+// });
+
 
 // Database connection
 mongoose
@@ -58,8 +83,6 @@ app.post("/upload", upload.single("product"), (req, res) => {
     image_url: `http://localhost:${process.env.PORT}/images/${req.file.filename}`,
   });
 });
-
- 
 
 app.post("/addproduct", async (req, res) => {
   let lastProduct = await Product.findOne().sort({ id: -1 });
@@ -146,11 +169,13 @@ app.post("/signup", async (req, res) => {
     email: req.body.email,
     password: req.body.password,
     cartData: cart,
+    isAdmin: req.body.isAdmin || false,
   });
   await user.save();
   const data = {
     user: {
       id: user.id,
+      isAdmin: user.isAdmin
     },
   };
   const token = jwt.sign(data, "secret_ecom");
@@ -170,9 +195,16 @@ app.post("/login", async (req, res) => {
       const data = {
         user: {
           id: user.id,
+          isAdmin: user.isAdmin
         },
       };
       const token = jwt.sign(data, "secret_ecom");
+      res.cookie("auth-token", token, {
+        httpOnly: true, // ✅ Prevents JavaScript from accessing the cookie
+        secure: false,  // ✅ Set to true if using HTTPS
+        sameSite: "Lax", // ✅ Allows cookie sharing between 5000 and 4000
+        maxAge: 24 * 60 * 60 * 1000, // ✅ 24-hour expiration
+    });
       res.json({ success: true, token });
     } else {
       res.json({ success: false, errors: "Wrong password" });
@@ -232,10 +264,10 @@ app.get("/yourorders", authMiddleware, async (req, res) => {
 app.post("/create-order", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
-    const cartItems  = req.body;
+    const cartItems = req.body;
 
     console.log("User ID:", userId);
-    // console.log("Received cart items:", cartItems); 
+    // console.log("Received cart items:", cartItems);
     // console.log("Raw Request Body:", req.body); // ✅ Log full request body
 
     // console.log("Parsed cart items:", cartItems); // ✅ Debugging log
@@ -244,14 +276,33 @@ app.post("/create-order", authMiddleware, async (req, res) => {
     //   return res.status(400).json({ message: "Cart is empty" });
     // }
 
-    const orderItems = Object.keys(cartItems)
-    .filter(productId => mongoose.Types.ObjectId.isValid(productId)) // ✅ Filter valid ObjectId
-    .map(productId => ({
-        productId: new mongoose.Types.ObjectId(productId),
-        quantity: cartItems[productId],
-    }));
+    // This is correct code
+    // const orderItems = Object.keys(cartItems)
+    // .filter(productId => mongoose.Types.ObjectId.isValid(productId)) // ✅ Filter valid ObjectId
+    // .map(productId => ({
+    //     productId: new mongoose.Types.ObjectId(productId),
+    //     quantity: cartItems[productId],
+    // }));
+ 
+const numericProductIds = Object.keys(cartItems).map(id => parseInt(id, 10)); // Convert to numbers
 
-    const totalAmount = orderItems.reduce((total, item) => total + item.quantity * 10, 0);
+// Fetch the correct MongoDB _id using the numeric id
+const products = await Product.find({ id: { $in: numericProductIds } }, "_id id new_price");
+
+const productIdMap = new Map(products.map(product => [product.id, product._id.toString()])); // Map id to _id
+
+const orderItems = numericProductIds.map(id => ({
+    productId: productIdMap.get(id), // Get _id from map
+    quantity: cartItems[id],
+}));
+
+// Calculate total price correctly
+const totalAmount = orderItems.reduce((total, item) => {
+    const price = products.find(p => p._id.toString() === item.productId)?.new_price || 0;
+    return total + (price * item.quantity);
+}, 0);
+
+    //const totalAmount = orderItems.reduce((total, item) => total + item.quantity * 10, 0);
 
     // const orderItems = Object.keys(cartItems)
     // // .map((productId) => parseInt(productId, 10)) // Convert to integer
@@ -261,7 +312,7 @@ app.post("/create-order", authMiddleware, async (req, res) => {
     //   const productIds = orderItems.map((item) => item.productId);
     //   console.log(productIds);
     //   const products = await Product.find({ id: { $in: productIds } });
-  
+
     //   console.log("📦 Fetched Products:", products);
 
     // // ✅ Match products with orderItems to get correct prices
@@ -286,29 +337,29 @@ app.post("/create-order", authMiddleware, async (req, res) => {
     // if (!cartItems || typeof cartItems !== "object") {
     //     return res.status(400).json({ message: "Invalid cart data received" });
     //   }
-  
+
     //   // ✅ Step 1: Extract `id` values from `cartItems` where quantity > 0
     // //   console.log(cartItems) correct hai
     // const productIds = Object.keys(cartItems).map((id) => parseInt(id, 10));
 
     //     // .map((id) => parseInt(id, 10)) // Convert keys to integer (match `id` in DB)
     //     // .filter((id) => !isNaN(id) && cartItems[id] > 0); // Ensure valid numbers with quantity > 0
-  
+
     // //   if (productIds.length === 0) {
     // //     return res.status(400).json({ message: "No valid products in cart" });
     // //   }
-  
+
     //   console.log("  Product IDs  ", productIds);
-  
+
     //   // ✅ Step 2: Fetch `_id` and `new_price` from products using `id`
     //   const products = await Product.find({ id: { $in: productIds } }, "_id id new_price name image");
-  
+
     //   console.log("📦 Fetched Products:", products);
-  
+
     //   if (!products || products.length === 0) {
     //     return res.status(400).json({ message: "No matching products found" });
     //   }
-  
+
     //   // ✅ Step 3: Match products with `cartItems` to create `orderItems`
     //   const orderItems = products.map((product) => ({
     //     productId: product._id, // Store MongoDB `_id`
@@ -318,16 +369,16 @@ app.post("/create-order", authMiddleware, async (req, res) => {
     //     price: product.new_price, // Store `new_price`
     //     total: product.new_price * cartItems[product.id], // Calculate total
     //   }));
-  
+
     //   console.log("📝 Order Items:", orderItems);
-  
+
     //   if (orderItems.length === 0) {
     //     return res.status(400).json({ message: "Order items could not be created" });
     //   }
-  
+
     //   // ✅ Step 4: Calculate total amount
     //   const totalAmount = orderItems.reduce((sum, item) => sum + item.total, 0);
-  
+
     const newOrder = new Order({
       userId,
       items: orderItems,
@@ -345,6 +396,24 @@ app.post("/create-order", authMiddleware, async (req, res) => {
       .json({ message: "Failed to create order", error: error.message });
   }
 });
+
+app.get("/admin/orders", adminMiddleware, async (req, res) => {
+    try {
+        const orders = await Order.find().populate("items.productId", "name image new_price");
+        
+        if (!orders || !Array.isArray(orders)) {
+            console.error("🚨 Orders response is invalid:", orders);
+            return res.status(500).json([]); // ✅ Always return an array
+        }
+
+        res.json(orders);
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).json([]); // ✅ Always return an array
+    }
+});
+
+  
 
 app.listen(process.env.PORT, (error) => {
   if (!error) {

@@ -39,12 +39,18 @@ const CartItems = () => {
         Object.entries(cartItems).filter(([id, quantity]) => quantity > 0)
     );
 
+    // const formattedCartItems = Object.fromEntries(
+    //     Object.entries(filteredCartItems).map(([key, value]) => [Number(key), value]) // Convert keys to numbers
+    // );
+
     const formattedCartItems = Object.fromEntries(
-        Object.entries(filteredCartItems).map(([key, value]) => [Number(key), value]) // Convert keys to numbers
-    );
-    
+            Object.entries(filteredCartItems)// Convert keys to numbers
+        );
+        
     console.log("✅ Sending filtered cart items:", filteredCartItems);
     console.log(formattedCartItems)
+    console.log("🛒 Final Cart Data Being Sent:", JSON.stringify(formattedCartItems, null, 2));
+
     
     
         try {
@@ -54,7 +60,7 @@ const CartItems = () => {
                     "Content-Type": "application/json",
                     "auth-token": authToken,
                 },
-                body: JSON.stringify({ cartItems: formattedCartItems}),
+                body: JSON.stringify(formattedCartItems),
             });
     
             const data = await response.json();
