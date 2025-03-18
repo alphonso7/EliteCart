@@ -16,7 +16,7 @@ const OrderList = () => {
 
         const fetchOrders = async () => {
             try {
-                const response = await fetch("https://localhost:3000/orders", {
+                const response = await fetch("http://localhost:3000/yourorders", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -24,7 +24,16 @@ const OrderList = () => {
                     },
                 });
                 const data = await response.json();
-                setOrders(data);
+                // setOrders(data);
+
+                console.log("📦 Fetched Orders:", data); // ✅ Debugging log
+
+                if (Array.isArray(data)) {
+                    setOrders(data); // ✅ Ensure `orders` is always an array
+                } else {
+                    console.error("🚨 Unexpected data format:", data);
+                    setOrders([]); // ✅ Fallback to empty array
+                }
             } catch (error) {
                 console.error("Error fetching orders:", error);
             }

@@ -15,6 +15,37 @@ const CartItems = () => {
             navigate("/signup");
             return;
         }
+
+    // console.log("🛒 Cart Items Before Sending:", cartItems); 
+        
+    //     const validCartItems = Object.fromEntries(
+    //         Object.entries(cartItems).filter(([productId, quantity]) => 
+    //             productId.length === 24 && quantity > 0 // ✅ Only allow valid MongoDB ObjectId (24 characters)
+    //         )
+    //     );
+
+    //     if (Object.keys(validCartItems).length === 0) {
+    //         alert("No valid products in the cart.");
+    //         return;
+    //     }
+    
+    //     console.log("Sending valid cart items:", validCartItems);
+    // console.log(validCartItems)
+
+   
+
+    console.log(cartItems);
+    const filteredCartItems = Object.fromEntries(
+        Object.entries(cartItems).filter(([id, quantity]) => quantity > 0)
+    );
+
+    const formattedCartItems = Object.fromEntries(
+        Object.entries(filteredCartItems).map(([key, value]) => [Number(key), value]) // Convert keys to numbers
+    );
+    
+    console.log("✅ Sending filtered cart items:", filteredCartItems);
+    console.log(formattedCartItems)
+    
     
         try {
             const response = await fetch("http://localhost:3000/create-order", { 
@@ -23,7 +54,7 @@ const CartItems = () => {
                     "Content-Type": "application/json",
                     "auth-token": authToken,
                 },
-                body: JSON.stringify({ cartItems }),
+                body: JSON.stringify({ cartItems: formattedCartItems}),
             });
     
             const data = await response.json();

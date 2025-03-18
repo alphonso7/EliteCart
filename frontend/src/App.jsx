@@ -9,6 +9,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import men_banner from './assets/banner_mens.png'
 import women_banner from './assets/banner_women.png'
 import kids_banner from './assets/banner_kids.png'
+import OrderList from './pages/Orderlist'
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
           <Route path='/Product/:ProductId' element={<Product/>} ></Route>
           <Route path='/Cart' element={<Cart/>} ></Route>
           <Route path='/signup' element={<LoginSignup/>} ></Route>
+          <Route path='/yourorders' element={<OrderList/>} ></Route>
         </Routes>
         </BrowserRouter>
         
