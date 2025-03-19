@@ -19,7 +19,7 @@ const UsersSchema = new mongoose.Schema({
         type:Date,
         default: Date.now,
     },
-    isAdmin: { type: Boolean, default: true }
+    isAdmin: { type: Boolean, default: false }
 })
 
 const Users = mongoose.model("Users", UsersSchema);

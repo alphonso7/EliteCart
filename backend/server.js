@@ -13,12 +13,12 @@ require("dotenv").config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+// app.use(cors());
 app.use(express.urlencoded({ extended: true })); // ✅ Ensures form data is parsed correctly
 app.use(cookieParser());
 
 const authMiddleware = require("./middleware/authMiddleware");
-const adminMiddleware = require('./middleware/adminMiddleware');
+// const adminMiddleware = require('./middleware/adminMiddleware');
 
 
 const allowedOrigins = ["http://localhost:5000", "http://localhost:4000"];
@@ -31,18 +31,19 @@ app.use(cors({
             callback(new Error("Not allowed by CORS"));
         }
     },
-    credentials: true // ✅ Allows cookies and authorization headers
+    credentials: true // ✅ REQUIRED for cookies to work
 }));
-app.options("*", cors()); 
 
-// app.use((req, res, next) => {
-//     res.header("Access-Control-Allow-Origin", req.headers.origin); // ✅ Dynamically set allowed origin
-//     res.header("Access-Control-Allow-Credentials", "true"); // ✅ Required for credentials
-//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-//     res.header("Access-Control-Allow-Headers", "Content-Type, auth-token");
-//     next();
-// });
-
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.header("Access-Control-Allow-Origin", origin);
+        res.header("Access-Control-Allow-Credentials", "true"); // ✅ REQUIRED
+        res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        res.header("Access-Control-Allow-Headers", "Content-Type, auth-token");
+    }
+    next();
+});
 
 // Database connection
 mongoose
@@ -180,8 +181,10 @@ app.post("/signup", async (req, res) => {
   };
   const token = jwt.sign(data, "secret_ecom");
   res.json({ success: true, token });
+  
+   
+  res.json({ success: true, isAdmin: user.isAdmin });
 });
-
 //creating endpoint for user login
 app.post("/login", async (req, res) => {
   let user = await Users.findOne({ email: req.body.email });
@@ -199,12 +202,7 @@ app.post("/login", async (req, res) => {
         },
       };
       const token = jwt.sign(data, "secret_ecom");
-      res.cookie("auth-token", token, {
-        httpOnly: true, // ✅ Prevents JavaScript from accessing the cookie
-        secure: false,  // ✅ Set to true if using HTTPS
-        sameSite: "Lax", // ✅ Allows cookie sharing between 5000 and 4000
-        maxAge: 24 * 60 * 60 * 1000, // ✅ 24-hour expiration
-    });
+       
       res.json({ success: true, token });
     } else {
       res.json({ success: false, errors: "Wrong password" });
@@ -397,22 +395,39 @@ const totalAmount = orderItems.reduce((total, item) => {
   }
 });
 
-app.get("/admin/orders", adminMiddleware, async (req, res) => {
-    try {
-        const orders = await Order.find().populate("items.productId", "name image new_price");
-        
-        if (!orders || !Array.isArray(orders)) {
-            console.error("🚨 Orders response is invalid:", orders);
-            return res.status(500).json([]); // ✅ Always return an array
-        }
+app.get("/admin/orders", async (req, res) => {
+  try {
+      const orders = await Order.find().populate("items.productId");  
 
-        res.json(orders);
-    } catch (error) {
-        console.error("Error fetching orders:", error);
-        res.status(500).json([]); // ✅ Always return an array
-    }
+      if (!Array.isArray(orders)) {
+          return res.status(500).json({ message: "Orders should be an array" });
+      }
+
+      res.json(orders);
+  } catch (error) {
+      console.error("Error fetching orders:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+  }
 });
 
+
+
+app.put("/admin/orders/:orderId", async (req, res) => {
+  try {
+      const { status } = req.body;
+      const orderId = req.params.orderId;
+
+      const updatedOrder = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
+      if (!updatedOrder) {
+          return res.status(404).json({ message: "Order not found" });
+      }
+
+      res.json({ success: true, message: "Order status updated", order: updatedOrder });
+  } catch (error) {
+      console.error("Error updating order status:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+  }
+});
   
 
 app.listen(process.env.PORT, (error) => {
