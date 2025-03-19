@@ -70,19 +70,31 @@ const ShopContextProvider = (props) =>{
     const removeFromCart = (itemId) =>{
         setcartItems((prev)=> ({...prev, [itemId]:prev[itemId]-1}));
     }
-
-    const getTotalCartAmount = () =>{
+    const getTotalCartAmount = () => {
         let totalAmount = 0;
+        
+        console.log("🔍 Available Product IDs:", all_products.map(p => p.id));
+
+    
+        // console.log(cartItems)
         for (const item in cartItems) {
-            if (cartItems[item]>0) {
-                 let productInfo = all_products.find((e) => Number(item) === Number(e.id))
-                 totalAmount += productInfo.new_price * cartItems[item]
-                
+            if (Number(cartItems[item]) > 0) {
+                let productInfo = all_products.find((e) => {return Number(item) === Number(e.id)});
+                // console.log(productInfo)
+    
+                if (!productInfo) {  
+                    console.warn(`⚠️ Product with ID ${item} not found in all_products.`);
+                    continue;
+                }
+    
+                totalAmount += productInfo.new_price * cartItems[item];
             }
-            
         }
+    
         return totalAmount;
-    }
+    };
+    
+        
 
     const getTotalCartItems = () =>{
         let totItems = 0;
