@@ -6,7 +6,8 @@ import pintester_icon from '../assets/pintester_icon.png'
 
 const Footer = () => {
   return (
-    <div className='h-30 bg-gray-200  font-semibold text-stone-700' >
+    <footer className="w-full bg-gray-200 font-semibold text-stone-700 mt-auto" >
+      <div className='h-30 bg-gray-200  font-semibold text-stone-700' >
       <span className="copyright flex space-x-1 pt-7 justify-center">
         <p>Copyright </p>
         <img className='w-5 h-5' src={copyright} alt="" />
@@ -18,6 +19,8 @@ const Footer = () => {
         <img className='w-5 h-5' src={whatsapp_icon} alt="" />
       </div>
     </div>
+    </footer>
+    
   )
 }
 

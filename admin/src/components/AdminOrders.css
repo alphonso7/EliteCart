@@ -1,0 +1,71 @@
+/* General styles */
+.admin-orders-container {
+    font-family: Arial, sans-serif;
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.admin-orders-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Table Styling */
+.admin-orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.admin-orders-table th, 
+.admin-orders-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.admin-orders-table th {
+    background-color: #007bff;
+    color: white;
+    text-transform: uppercase;
+}
+
+.admin-orders-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Product list inside the table */
+.admin-orders-products p {
+    margin: 5px 0;
+    color: #555;
+}
+
+/* Status Dropdown */
+.admin-orders-status select {
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+}
+
+.admin-orders-status select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+/* No Orders Message */
+.no-orders {
+    text-align: center;
+    color: #777;
+    font-size: 18px;
+    margin-top: 20px;
+}

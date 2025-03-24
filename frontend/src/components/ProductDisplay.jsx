@@ -3,7 +3,10 @@ import star_icon from '../assets/star_icon.png'
 import star_dull_icon from '../assets/star_dull_icon.png'
 import { ShopContext } from '../Context/ShopContext'
 
+
 const ProductDisplay = (props) => {
+
+  
   const [color, setColor] = useState('bg-gray-300');
   const {addToCart} = useContext(ShopContext);
 

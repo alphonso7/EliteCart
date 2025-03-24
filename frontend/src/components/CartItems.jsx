@@ -1,9 +1,83 @@
 import React, { useContext } from 'react'
 import { ShopContext } from '../Context/ShopContext'
 import remove_icon from '../assets/cart_cross_icon.png'
+import { useNavigate } from 'react-router-dom'
 
 const CartItems = () => {
     const { all_products, cartItems, removeFromCart, getTotalCartAmount } = useContext(ShopContext);
+
+    const navigate = useNavigate();
+
+    const handleCheckout = async () => {
+        const authToken = localStorage.getItem("auth-token");
+    
+        if (!authToken) {
+            navigate("/signup");
+            return;
+        }
+
+    // console.log("🛒 Cart Items Before Sending:", cartItems); 
+        
+    //     const validCartItems = Object.fromEntries(
+    //         Object.entries(cartItems).filter(([productId, quantity]) => 
+    //             productId.length === 24 && quantity > 0 // ✅ Only allow valid MongoDB ObjectId (24 characters)
+    //         )
+    //     );
+
+    //     if (Object.keys(validCartItems).length === 0) {
+    //         alert("No valid products in the cart.");
+    //         return;
+    //     }
+    
+    //     console.log("Sending valid cart items:", validCartItems);
+    // console.log(validCartItems)
+
+   
+
+    console.log(cartItems);
+    const filteredCartItems = Object.fromEntries(
+        Object.entries(cartItems).filter(([id, quantity]) => quantity > 0)
+    );
+
+    // const formattedCartItems = Object.fromEntries(
+    //     Object.entries(filteredCartItems).map(([key, value]) => [Number(key), value]) // Convert keys to numbers
+    // );
+
+    const formattedCartItems = Object.fromEntries(
+            Object.entries(filteredCartItems)// Convert keys to numbers
+        );
+        
+    console.log("✅ Sending filtered cart items:", filteredCartItems);
+    console.log(formattedCartItems)
+    console.log("🛒 Final Cart Data Being Sent:", JSON.stringify(formattedCartItems, null, 2));
+
+    
+    
+        try {
+            const response = await fetch("http://localhost:3000/create-order", { 
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "auth-token": authToken,
+                },
+                body: JSON.stringify(formattedCartItems),
+            });
+    
+            const data = await response.json();
+            console.log("Checkout Response:", data); // ✅ Debugging log
+    
+            if (data.success) {
+                navigate("/yourorders");
+            } else {
+                alert("Failed to place order: " + (data.message || "Unknown error"));
+            }
+        } catch (error) {
+            console.error("Checkout error:", error); // ✅ Log full error
+            alert("An error occurred while placing the order. Check the console for details.");
+        }
+    };
+    
+
     return (
         <div className='cartitems p-4 sm:m-10' >
             <div className="cartitemsFormat grid grid-cols-6 justify-items-center gap-4 py-2 border-b font-semibold">
@@ -40,7 +114,7 @@ const CartItems = () => {
                 <p className="text-xl font-semibold">Total: <span className="text-gray-800">${getTotalCartAmount()}</span></p>
             </div>
             <div> 
-                <button className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
+                <button onClick={handleCheckout} className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
                      PROCEED TO CHECKOUT
                 </button>
             </div>
