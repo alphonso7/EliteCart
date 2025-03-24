@@ -430,6 +430,157 @@ app.put("/admin/orders/:orderId", async (req, res) => {
 });
   
 
+const Vibrant = require("node-vibrant/browser");
+
+async function extractColorFromImage(imageUrl) {
+    try {
+        const palette = await Vibrant.from(imageUrl).getPalette();
+        return palette.Vibrant.getHex(); // Extract dominant color
+    } catch (error) {
+        console.error("❌ Error extracting color:", error);
+        return "#A0A0A0"; // Default color
+    }
+}
+
+app.post("/api/add-product", async (req, res) => {
+    const { name, image, category, new_price, old_price, available } = req.body;
+    
+    const dominantColor = await extractColorFromImage(image);
+
+    const newProduct = new Product({
+        name,
+        image,
+        category,
+        new_price,
+        old_price,
+        available,
+        color: dominantColor // ✅ Store extracted color
+    });
+
+    await newProduct.save();
+    res.json({ success: true, product: newProduct });
+});
+
+
+
+
+app.get("/api/products", async (req, res) => {
+  try {
+      let products = await Product.find({});
+      let productsWithColors = await Promise.all(products.map(getProductWithColors));
+      res.json(productsWithColors);
+  } catch (error) {
+      console.error("Error fetching products:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+const chroma = require("chroma-js");
+
+// app.get("/api/recommendations", async (req, res) => {
+//     const selectedColor = req.query.color;
+//     if (!selectedColor) {
+//         return res.status(400).json({ error: "Color is required" });
+//     }
+
+//     console.log("🎨 Received Color:", selectedColor);
+
+//     try {
+//         const products = await Product.find({});
+
+//         // Ensure selectedColor is valid
+//         const selectedColorRGB = chroma.valid(selectedColor) ? chroma(selectedColor).rgb() : null;
+//         if (!selectedColorRGB) {
+//             console.error("❌ Invalid color format received:", selectedColor);
+//             return res.status(400).json({ error: "Invalid color format" });
+//         }
+
+//         console.log("🎨 Converted RGB:", selectedColorRGB);
+
+//         const getColorDistance = (color) => {
+//             if (!color || !chroma.valid(color)) {
+//                 console.warn("⚠️ Invalid color detected, using default gray:", color);
+//                 color = "#A0A0A0"; // Default color if missing
+//             }
+//             const productColorRGB = chroma(color).rgb();
+//             return Math.sqrt(
+//                 (selectedColorRGB[0] - productColorRGB[0]) ** 2 +
+//                 (selectedColorRGB[1] - productColorRGB[1]) ** 2 +
+//                 (selectedColorRGB[2] - productColorRGB[2]) ** 2
+//             );
+//         };
+
+//         const relatedProducts = products
+//             .map((product) => {
+//                 const distance = getColorDistance(product.color);
+//                 return { ...product._doc, colorDistance: distance };
+//             })
+//             .filter((product) => product.colorDistance !== Infinity) // Ignore invalid colors
+//             .sort((a, b) => a.colorDistance - b.colorDistance)
+//             .slice(0, 6);
+
+//         console.log("✅ Related Products Found:", relatedProducts.length);
+//         res.json(relatedProducts);
+//     } catch (error) {
+//         console.error("❌ Server Error Fetching Related Products:", error);
+//         res.status(500).json({ error: "Internal Server Error" });
+//     }
+// });
+
+
+
+app.get("/api/recommendations", async (req, res) => {
+  const selectedColor = req.query.color;
+  const selectedProductId = req.query.productId;
+
+  if (!selectedColor) {
+      return res.status(400).json({ error: "Color is required" });
+  }
+
+  console.log("🎨 Received Color:", selectedColor);
+
+  try {
+      const products = await Product.find({});
+      const selectedColorRGB = chroma.valid(selectedColor) ? chroma(selectedColor).rgb() : null;
+
+      if (!selectedColorRGB) {
+          console.error("❌ Invalid color format:", selectedColor);
+          return res.status(400).json({ error: "Invalid color format" });
+      }
+
+      console.log("🎨 Converted RGB:", selectedColorRGB);
+
+      // ✅ Calculate color distance to improve accuracy
+      const getColorDistance = (color) => {
+          if (!color || !chroma.valid(color)) return Infinity; // Skip invalid colors
+
+          const productColorRGB = chroma(color).rgb();
+          return Math.sqrt(
+              (selectedColorRGB[0] - productColorRGB[0]) ** 2 +
+              (selectedColorRGB[1] - productColorRGB[1]) ** 2 +
+              (selectedColorRGB[2] - productColorRGB[2]) ** 2
+          );
+      };
+
+      // ✅ Find the closest colors instead of exact matches
+      const relatedProducts = products
+          .map((product) => ({
+              ...product._doc,
+              colorDistance: getColorDistance(product.color),
+          }))
+          .filter((product) => product._id.toString() !== selectedProductId)  // ✅ Remove clicked product
+          .sort((a, b) => a.colorDistance - b.colorDistance) // ✅ Sort by color similarity
+          .slice(0, 3); // ✅ Return only top 3 most similar products
+
+      console.log("✅ Related Products Found:", relatedProducts.length);
+      res.json(relatedProducts);
+  } catch (error) {
+      console.error("❌ Server Error Fetching Related Products:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
 app.listen(process.env.PORT, (error) => {
   if (!error) {
     console.log(`Server running on port ${process.env.PORT}`);
