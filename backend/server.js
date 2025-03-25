@@ -7,7 +7,9 @@ const path = require("path");
 const Product = require("./models/Product");
 const Users = require("./models/Users");
 const Order = require("./models/Order");
-const cookieParser = require("cookie-parser");
+const Jimp = require("jimp");
+const { kmeans } = require("ml-kmeans");   // ✅ Fix Import
+
 
 require("dotenv").config();
 
@@ -15,7 +17,6 @@ const app = express();
 app.use(express.json());
 // app.use(cors());
 app.use(express.urlencoded({ extended: true })); // ✅ Ensures form data is parsed correctly
-app.use(cookieParser());
 
 const authMiddleware = require("./middleware/authMiddleware");
 // const adminMiddleware = require('./middleware/adminMiddleware');
@@ -528,58 +529,156 @@ const chroma = require("chroma-js");
 // });
 
 
+//Latest working code do not close this
+// app.get("/api/recommendations", async (req, res) => {
+//   console.log(req.query);
+//   const { productId } = req.query;
 
-app.get("/api/recommendations", async (req, res) => {
-  const selectedColor = req.query.color;
-  const selectedProductId = req.query.productId;
+//   if (!productId) {
+//       return res.status(400).json({ error: "Product ID is required" });
+//   }
 
-  if (!selectedColor) {
-      return res.status(400).json({ error: "Color is required" });
-  }
+//   try {
+//       // ✅ Get selected product's image URL
+//       const selectedProduct = await Product.findOne({  id: Number(productId) });
+//       if (!selectedProduct) {
+//           return res.status(404).json({ error: "Product not found" });
+//       }
 
-  console.log("🎨 Received Color:", selectedColor);
+//       console.log(`🖼 Extracting color for selected product: ${selectedProduct.image}`);
+//       const selectedColor = await extractCenterColor(selectedProduct.image);
+//       const selectedColorLAB = chroma(selectedColor).lab(); // Convert to LAB color space
 
+//       // ✅ Fetch all products
+//       const products = await Product.find({});
+      
+//       // ✅ Extract center colors for all products dynamically
+//       const colorPromises = products.map(async (product) => ({
+//           ...product._doc,
+//           centerColor: await extractCenterColor(product.image)
+//       }));
+      
+//       const productsWithColors = await Promise.all(colorPromises);
+
+//       // ✅ Function to Calculate Color Similarity (CIE-LAB)
+//       const getColorDistance = (color) => {
+//           if (!color || !chroma.valid(color)) return Infinity;
+
+//           const productColorLAB = chroma(color).lab();
+//           return Math.sqrt(
+//               (selectedColorLAB[0] - productColorLAB[0]) ** 2 +
+//               (selectedColorLAB[1] - productColorLAB[1]) ** 2 +
+//               (selectedColorLAB[2] - productColorLAB[2]) ** 2
+//           );
+//       };
+
+//       // ✅ Find 6 Products with Closest Center Colors
+//       const relatedProducts = productsWithColors
+//           .map((product) => ({
+//               ...product,
+//               colorDistance: getColorDistance(product.centerColor),
+//           }))
+//           .filter((product) => product.product_id !== productId)  // ✅ Exclude selected product
+//           .sort((a, b) => a.colorDistance - b.colorDistance) // ✅ Sort by similarity
+//           .slice(0, 6); // ✅ Show top 6 related products
+
+//       console.log("✅ Related Products Found:", relatedProducts.length);
+//       res.json(relatedProducts);
+//   } catch (error) {
+//       console.error("❌ Error fetching recommendations:", error);
+//       res.status(500).json({ error: "Failed to fetch related products" });
+//   }
+// });
+const extractCenterColor = async (imageUrl) => {
   try {
-      const products = await Product.find({});
-      const selectedColorRGB = chroma.valid(selectedColor) ? chroma(selectedColor).rgb() : null;
+      const image = await Jimp.read(imageUrl);
+      const centerX = Math.floor(image.bitmap.width / 2);
+      const centerY = Math.floor(image.bitmap.height / 2);
 
-      if (!selectedColorRGB) {
-          console.error("❌ Invalid color format:", selectedColor);
-          return res.status(400).json({ error: "Invalid color format" });
+      // ✅ Extract a small 5x5 pixel average color from the center
+      let r = 0, g = 0, b = 0, count = 0;
+      for (let x = centerX - 2; x <= centerX + 2; x++) {
+          for (let y = centerY - 2; y <= centerY + 2; y++) {
+              const color = Jimp.intToRGBA(image.getPixelColor(x, y));
+              r += color.r;
+              g += color.g;
+              b += color.b;
+              count++;
+          }
       }
 
-      console.log("🎨 Converted RGB:", selectedColorRGB);
+      const avgColor = chroma(r / count, g / count, b / count).rgb(); // Convert to RGB array
+      console.log(`🎨 Extracted Center Color: ${avgColor} from ${imageUrl}`);
+      return avgColor;
+  } catch (error) {
+      console.error("❌ Error extracting center color:", error);
+      return [150, 150, 150]; // Default fallback color
+  }
+};
 
-      // ✅ Calculate color distance to improve accuracy
-      const getColorDistance = (color) => {
-          if (!color || !chroma.valid(color)) return Infinity; // Skip invalid colors
+// ✅ Find Related Products Using K-Means Clustering
+app.get("/api/recommendations", async (req, res) => {
+  const { productId } = req.query;
 
-          const productColorRGB = chroma(color).rgb();
-          return Math.sqrt(
-              (selectedColorRGB[0] - productColorRGB[0]) ** 2 +
-              (selectedColorRGB[1] - productColorRGB[1]) ** 2 +
-              (selectedColorRGB[2] - productColorRGB[2]) ** 2
-          );
-      };
+  if (!productId) {
+      return res.status(400).json({ error: "Product ID is required" });
+  }
 
-      // ✅ Find the closest colors instead of exact matches
-      const relatedProducts = products
-          .map((product) => ({
-              ...product._doc,
-              colorDistance: getColorDistance(product.color),
+  try {
+      // ✅ Get selected product's image URL
+      const selectedProduct = await Product.findOne({ id: Number(productId) });
+      if (!selectedProduct) {
+          return res.status(404).json({ error: "Product not found" });
+      }
+
+      console.log(`🖼 Extracting color for selected product: ${selectedProduct.image}`);
+      const selectedColor = await extractCenterColor(selectedProduct.image);
+
+      // ✅ Fetch all products
+      const products = await Product.find({});
+      
+      // ✅ Extract center colors for all products dynamically
+      const colorPromises = products.map(async (product) => ({
+          ...product._doc,
+          centerColor: await extractCenterColor(product.image)
+      }));
+      
+      const productsWithColors = await Promise.all(colorPromises);
+      console.log("✅ kmeans function:", typeof kmeans);
+
+
+      const colorVectors = productsWithColors.map(p => p.centerColor).filter(c => c.length === 3);
+      if (colorVectors.length === 0) {
+          return res.status(500).json({ error: "No valid color data found" });
+      }
+
+      console.log("📊 Running K-Means on", colorVectors.length, "color samples...");
+
+      // ✅ K-Means Clustering (Fix)
+      let k = Math.min(5, colorVectors.length);  // ✅ Ensure `k` is within valid range
+      const clusters = kmeans(colorVectors, k);  // ✅ Fix K-Means Usage
+      console.log("✅ K-Means Clusters Generated:", clusters.centroids);
+
+      // ✅ Find the cluster of the selected product
+      const selectedCluster = clusters.clusters[productsWithColors.findIndex(p => p.id === Number(productId))];
+      console.log(`📌 Selected Product Cluster: ${selectedCluster}`);
+
+      // ✅ Get products from the same cluster
+      const relatedProducts = productsWithColors
+          .map((product, index) => ({
+              ...product,
+              cluster: clusters.clusters[index]
           }))
-          .filter((product) => product._id.toString() !== selectedProductId)  // ✅ Remove clicked product
-          .sort((a, b) => a.colorDistance - b.colorDistance) // ✅ Sort by color similarity
-          .slice(0, 3); // ✅ Return only top 3 most similar products
+          .filter((product) => product.cluster === selectedCluster && product.id !== Number(productId)) // Exclude selected product
+          .slice(0, 6); // ✅ Show top 6 related products
 
       console.log("✅ Related Products Found:", relatedProducts.length);
       res.json(relatedProducts);
   } catch (error) {
-      console.error("❌ Server Error Fetching Related Products:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      console.error("❌ Error fetching recommendations:", error);
+      res.status(500).json({ error: "Failed to fetch related products" });
   }
 });
-
 
 app.listen(process.env.PORT, (error) => {
   if (!error) {
