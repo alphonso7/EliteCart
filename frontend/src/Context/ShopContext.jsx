@@ -17,16 +17,27 @@ const getDefaultCart = ()=>{
 
 const ShopContextProvider = (props) =>{
 
+<<<<<<< HEAD
     const [searchQuery, setSearchQuery] = useState("");
 
 
     const [all_products, setAllProduct] = useState([]);
+=======
+    // const [all_products, setAllProduct] = useState([]);
+>>>>>>> dev
 
     const [cartItems, setcartItems] = useState(()=>{
         const savedCart = localStorage.getItem("cartItems");
         return savedCart ? JSON.parse(savedCart) : getDefaultCart();
     }   
     );
+
+    // useEffect(()=>{
+    //     fetch('http://localhost:3000/allproducts')
+    //     .then((resp) => resp.json())
+    //     .then((data) => {setAllProduct(data)});
+    // },[]);
+  
 
     useEffect(() => {
         fetch('http://localhost:3000/allproducts')

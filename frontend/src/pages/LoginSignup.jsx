@@ -59,6 +59,7 @@ const LoginSignup = () => {
   }
 
   return (
+<<<<<<< HEAD
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
     <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
       <h2 className="text-2xl font-semibold text-center mb-4">{state}</h2>
@@ -129,6 +130,29 @@ const LoginSignup = () => {
             </span>
           </p>
         )}
+=======
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-6 rounded-lg shadow-md w-96">
+        <h2 className="text-2xl font-semibold text-center mb-4">{state}</h2>
+        <div className="name">
+          {state==="Sign up"?<input name='username'value={formData.username} onChange={handleChange} type="text" placeholder='Name'/>:<></>}
+        </div>
+        <div className="email">
+          <input name='email' value={formData.email} onChange={handleChange} type="email" placeholder='email' />
+        </div>
+        <div className="password">
+          <input name='password' value={formData.password} onChange={handleChange} type="password" placeholder='password' />
+        </div>
+        <div className="continue">
+          <button onClick={() => {state==="Login"?login():Signup()}} >Continue</button>
+        </div>
+        <div className="already">
+          {state==="Sign up"?<p>Already have an account? <span onClick={()=> {setState("Login")}} >Login here</span> </p>:<></>}
+          {state==="Login"?<p>Create an account? <span onClick={()=> {setState("Sign up")}} >Click here</span> </p>:<></>}
+          
+          
+        </div>
+>>>>>>> dev
       </div>
     </div>
   </div>
