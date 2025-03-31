@@ -34,11 +34,7 @@ const Navbar = () => {
           {/* <a href="#" className="hover:text-black">Cart (0)</a> */}
           {/* <a href="#" className="hover:text-black">Sign In</a> */}
 
-<<<<<<< HEAD
-          {localStorage.getItem('auth-token')? <button className='hover:text-black cursor-pointer' onClick={()=> {localStorage.removeItem('auth-token'); window.location.replace('/')}} >Logout</button>: <Link to={'/signup'} className='hover:text-black cursor-pointer' >Login</Link>}
-=======
           {localStorage.getItem('auth-token')? <button onClick={()=> {localStorage.removeItem('auth-token'); window.location.replace('/')}} >Logout</button>: <Link to={'/signup'} className='hover:text-black' >Login</Link>}
->>>>>>> dev
           
           {/* <FiSearch className="text-xl cursor-pointer hover:text-black" /> */}
         </div>
