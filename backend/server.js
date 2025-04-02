@@ -7,7 +7,10 @@ const path = require("path");
 const Product = require("./models/Product");
 const Users = require("./models/Users");
 const Order = require("./models/Order");
-const cookieParser = require("cookie-parser");
+const Jimp = require('jimp');
+// const products = require('../frontend/src/assets')
+// const axios = require('axios');
+// const all_products = require('../frontend/src/assets/all_product.js');
 
 require("dotenv").config();
 
@@ -15,7 +18,6 @@ const app = express();
 app.use(express.json());
 // app.use(cors());
 app.use(express.urlencoded({ extended: true })); // ✅ Ensures form data is parsed correctly
-app.use(cookieParser());
 
 const authMiddleware = require("./middleware/authMiddleware");
 // const adminMiddleware = require('./middleware/adminMiddleware');
@@ -428,6 +430,55 @@ app.put("/admin/orders/:orderId", async (req, res) => {
       res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+// // Serve static images
+// app.use('/images', express.static(path.join(__dirname, 'public/images')));
+
+// // Function to get center color
+// async function getCenterColor(imageName) {
+//     try {
+//         const imagePath = path.join(__dirname, 'public/images', imageName);
+//         const image = await Jimp.read(imagePath);
+//         const centerX = Math.floor(image.bitmap.width / 2);
+//         const centerY = Math.floor(image.bitmap.height / 2);
+//         const color = Jimp.intToRGBA(image.getPixelColor(centerX, centerY));
+//         return color;
+//     } catch (error) {
+//         console.error("Error extracting color:", error);
+//         return null;
+//     }
+// }
+
+// // API to fetch related products
+// app.get('/api/related-products/:productId', async (req, res) => {
+//     try {
+//         const productId = parseInt(req.params.productId);
+//         const currentProduct = all_products.find(p => p.id === productId);
+
+//         if (!currentProduct) return res.status(404).json({ error: "Product not found" });
+
+//         const currentColor = await getCenterColor(currentProduct.image);
+//         if (!currentColor) return res.status(500).json({ error: "Could not extract color" });
+
+//         let relatedProducts = [];
+
+//         for (const product of all_products) {
+//             if (product.id !== productId) {
+//                 const productColor = await getCenterColor(product.image);
+//                 if (productColor) {
+//                     const distance = colorDistance(currentColor, productColor);
+//                     relatedProducts.push({ ...product, distance });
+//                 }
+//             }
+//         }
+
+//         relatedProducts.sort((a, b) => a.distance - b.distance);
+//         res.json(relatedProducts.slice(0, 5));
+//     } catch (error) {
+//         console.error("Error fetching related products:", error);
+//         res.status(500).json({ error: "Internal server error" });
+//     }
+// });
   
 
 app.listen(process.env.PORT, (error) => {

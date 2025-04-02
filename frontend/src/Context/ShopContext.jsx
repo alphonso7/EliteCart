@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-// import all_products from '../assets/all_product'
+import all_products from '../assets/all_product'
 import Product from "../pages/Product";
 
 export const ShopContext = createContext(null)
@@ -20,7 +20,7 @@ const ShopContextProvider = (props) =>{
     const [searchQuery, setSearchQuery] = useState("");
 
 
-    const [all_products, setAllProduct] = useState([]);
+    // const [all_products, setAllProduct] = useState([]);
 
     const [cartItems, setcartItems] = useState(()=>{
         const savedCart = localStorage.getItem("cartItems");
@@ -28,15 +28,15 @@ const ShopContextProvider = (props) =>{
     }   
     );
 
-    useEffect(() => {
-        fetch('http://localhost:3000/allproducts')
-            .then((resp) => resp.json())
-            .then((data) => {
-                setAllProduct(data);
-                console.log(data)
-            })
-            .catch((err) => console.error("Fetch error:", err));
-    }, []);
+    // useEffect(() => {
+    //     fetch('http://localhost:3000/allproducts')
+    //         .then((resp) => resp.json())
+    //         .then((data) => {
+    //             setAllProduct(data);
+    //             console.log(data)
+    //         })
+    //         .catch((err) => console.error("Fetch error:", err));
+    // }, []);
 
     const filteredProducts = searchQuery.trim()
     ? all_products.filter((product) =>
