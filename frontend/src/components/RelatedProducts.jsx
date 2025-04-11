@@ -159,10 +159,15 @@ const RelatedProducts = ({ selectedProduct }) => {
                 {relatedProducts.length > 0 ? (
                     relatedProducts.map((item) => (
                         <Item
-                            key={item.product_id}
-                            id={item.product_id}
+                            // key={item.product_id}
+                            // id={item.product_id}
+                            key={item.id}
+                            id={item.id}
                             name={item.name}
                             image={item.image}
+                            newPrice={item.new_price}
+                            oldPrice={item.old_price}
+
                         />
                     ))
                 ) : (
