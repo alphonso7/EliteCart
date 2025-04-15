@@ -73,12 +73,14 @@ const moodColors = {
     romantic: { r: 240, g: 120, b: 160 },
 };
 
+
 const RelatedProducts = ({ selectedProduct }) => {
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [allProducts, setAllProducts] = useState([]);
     const [mood, setMood] = useState(null);
     const [showMoodOptions, setShowMoodOptions] = useState(false);
     const [showViewSimilarButton, setShowViewSimilarButton] = useState(false);
+    const [avgColorDistance, setAvgColorDistance] = useState(null);
 
 
     useEffect(() => {
@@ -149,12 +151,22 @@ const RelatedProducts = ({ selectedProduct }) => {
                 allProducts.map(async (p) => {
                     const color = await getCenterColor(p.image);
                     const dist = colorDistance(color, moodColor);
-                    return { ...p, distance: dist };
+                    return { ...p, distance: dist, color };
                 })
             );
+            
             moodFiltered.sort((a, b) => a.distance - b.distance);
-            setRelatedProducts(moodFiltered.slice(0, 6));
+            const topProducts = moodFiltered.slice(0, 6);
+            
+            // Calculate average color distance
+            const avgDistance = topProducts.length > 0
+                ? (topProducts.reduce((sum, p) => sum + p.distance, 0) / topProducts.length).toFixed(2)
+                : null;
+        
+            setAvgColorDistance(avgDistance);
+            setRelatedProducts(topProducts);
         };
+        
 
         fetchByMood();
 
@@ -205,6 +217,16 @@ const RelatedProducts = ({ selectedProduct }) => {
                 </div>
 
             </div>
+
+            <h2 className="text-xl font-semibold text-gray-600 justify-self-center " >{mood}</h2>
+            {avgColorDistance && (
+                <div className="text-center mb-4">
+                    <p className="text-sm text-gray-600">
+                        🎯 <strong>Average Color Distance:</strong> {avgColorDistance}
+                    </p>
+                </div>
+            )}
+
 
             <hr className="border-gray-300 my-4" />
             <div className="products grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-6">
