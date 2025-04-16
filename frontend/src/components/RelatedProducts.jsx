@@ -1,69 +1,9 @@
 
-// import React, { useState, useEffect } from "react";
-// import axios from "axios";
-// import Item from "../components/Item";
-
-// const RelatedProducts = ({ selectedProduct }) => {
-//     const [relatedProducts, setRelatedProducts] = useState([]);
-
-//     useEffect(() => {
-//       if (!selectedProduct || !selectedProduct.id) {
-//           console.error("❌ No product ID found in selectedProduct:", selectedProduct);
-//           return;
-//       }
-
-//       const productId = selectedProduct.id;
-//       const apiUrl = `http://localhost:3000/api/recommendations?productId=${productId}`;
-//       console.log("🔗 API Request URL:", apiUrl);  // ✅ Debugging URL
-
-//       const fetchRelatedProducts = async () => {
-//           try {
-//               const response = await axios.get(apiUrl);
-//               console.log("🎯 Related Products:", response.data);
-//               setRelatedProducts(response.data);
-//           } catch (error) {
-//               console.error("❌ Error fetching related products:", error);
-//           }
-//       };
-
-//       fetchRelatedProducts();
-//   }, [selectedProduct]);
-
-//     return (
-//         <div className="w-full px-4">
-//             <div className="relatedProducts text-center my-6">
-//                 <h1 className="text-2xl font-semibold text-gray-600">Related Products</h1>
-//             </div>
-//             <hr className="border-gray-300 my-4" />
-//             <div className="products grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-6">
-//                 {relatedProducts.length > 0 ? (
-//                     relatedProducts.map((item) => (
-//                         <Item
-//                             // key={item.product_id}
-//                             // id={item.product_id}
-//                             key={item.id}
-//                             id={item.id}
-//                             name={item.name}
-//                             image={item.image}
-//                             newPrice={item.new_price}
-//                             oldPrice={item.old_price}
-
-//                         />
-//                     ))
-//                 ) : (
-//                     <p className="text-center text-gray-500">No related products found.</p>
-//                 )}
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default RelatedProducts;
-
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Item from "../components/Item";
+import chroma from "chroma-js";
+
 
 const moodColors = {
     chill: { r: 150, g: 200, b: 230 },
@@ -115,7 +55,29 @@ const RelatedProducts = ({ selectedProduct }) => {
         if (!mood || allProducts.length === 0) return;
         const moodColor = moodColors[mood];
 
-        const getCenterColor = (imageSrc) => {
+        // const getCenterColor = (imageSrc) => {
+        //     return new Promise((resolve, reject) => {
+        //         const img = new Image();
+        //         img.crossOrigin = "Anonymous";
+        //         img.src = imageSrc;
+        //         img.onload = () => {
+        //             const canvas = document.createElement("canvas");
+        //             const ctx = canvas.getContext("2d");
+        //             canvas.width = img.width;
+        //             canvas.height = img.height;
+        //             ctx.drawImage(img, 0, 0, img.width, img.height);
+        //             const pixel = ctx.getImageData(
+        //                 Math.floor(img.width / 2),
+        //                 Math.floor(img.height / 2),
+        //                 1,
+        //                 1
+        //             ).data;
+        //             resolve({ r: pixel[0], g: pixel[1], b: pixel[2] });
+        //         };
+        //         img.onerror = reject;
+        //     });
+        // };
+        const getAverageCenterColor = (imageSrc) => {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.crossOrigin = "Anonymous";
@@ -126,46 +88,89 @@ const RelatedProducts = ({ selectedProduct }) => {
                     canvas.width = img.width;
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0, img.width, img.height);
-                    const pixel = ctx.getImageData(
-                        Math.floor(img.width / 2),
-                        Math.floor(img.height / 2),
-                        1,
-                        1
-                    ).data;
-                    resolve({ r: pixel[0], g: pixel[1], b: pixel[2] });
+        
+                    const regionSize = 50;
+                    const startX = Math.max(Math.floor(img.width / 2 - regionSize / 2), 0);
+                    const startY = Math.max(Math.floor(img.height / 2 - regionSize / 2), 0);
+                    const pixelData = ctx.getImageData(startX, startY, regionSize, regionSize).data;
+        
+                    let r = 0, g = 0, b = 0, count = 0;
+                    for (let i = 0; i < pixelData.length; i += 4) {
+                        r += pixelData[i];
+                        g += pixelData[i + 1];
+                        b += pixelData[i + 2];
+                        count++;
+                    }
+        
+                    resolve({ r: Math.round(r / count), g: Math.round(g / count), b: Math.round(b / count) });
                 };
                 img.onerror = reject;
             });
         };
+        
 
+        // const colorDistance = (c1, c2) => {
+        //     return Math.sqrt(
+        //         Math.pow(c1.r - c2.r, 2) +
+        //         Math.pow(c1.g - c2.g, 2) +
+        //         Math.pow(c1.b - c2.b, 2)
+        //     );
+        // };
         const colorDistance = (c1, c2) => {
-            return Math.sqrt(
-                Math.pow(c1.r - c2.r, 2) +
-                Math.pow(c1.g - c2.g, 2) +
-                Math.pow(c1.b - c2.b, 2)
+            const lab1 = chroma.rgb(c1.r, c1.g, c1.b).lab();
+            const lab2 = chroma.rgb(c2.r, c2.g, c2.b).lab();
+            const deltaE = Math.sqrt(
+                Math.pow(lab1[0] - lab2[0], 2) +
+                Math.pow(lab1[1] - lab2[1], 2) +
+                Math.pow(lab1[2] - lab2[2], 2)
             );
+            return deltaE;
         };
-
+        
+        // const fetchByMood = async () => {
+        //     const moodFiltered = await Promise.all(
+        //         allProducts.map(async (p) => {
+        //             const color = await getCenterColor(p.image);
+        //             const dist = colorDistance(color, moodColor);
+        //             return { ...p, distance: dist, color };
+        //         })
+        //     );
+            
+        //     moodFiltered.sort((a, b) => a.distance - b.distance);
+        //     const topProducts = moodFiltered.slice(0, 10);
+            
+        //     // Calculate average color distance
+        //     const avgDistance = topProducts.length > 0
+        //         ? (topProducts.reduce((sum, p) => sum + p.distance, 0) / topProducts.length).toFixed(2)
+        //         : null;
+        
+        //     setAvgColorDistance(avgDistance);
+        //     setRelatedProducts(topProducts);
+        // };
         const fetchByMood = async () => {
             const moodFiltered = await Promise.all(
                 allProducts.map(async (p) => {
-                    const color = await getCenterColor(p.image);
+                    const color = await getAverageCenterColor(p.image);
                     const dist = colorDistance(color, moodColor);
                     return { ...p, distance: dist, color };
                 })
             );
-            
+        
             moodFiltered.sort((a, b) => a.distance - b.distance);
             const topProducts = moodFiltered.slice(0, 6);
-            
-            // Calculate average color distance
+        
             const avgDistance = topProducts.length > 0
                 ? (topProducts.reduce((sum, p) => sum + p.distance, 0) / topProducts.length).toFixed(2)
                 : null;
         
-            setAvgColorDistance(avgDistance);
+            const stdDev = topProducts.length > 1
+                ? Math.sqrt(topProducts.reduce((sum, p) => sum + Math.pow(p.distance - avgDistance, 2), 0) / topProducts.length).toFixed(2)
+                : null;
+        
+            setAvgColorDistance(`${avgDistance} (±${stdDev})`);
             setRelatedProducts(topProducts);
         };
+        
         
 
         fetchByMood();
