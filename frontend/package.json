@@ -15,6 +15,7 @@
     "chroma-js": "^3.1.2",
     "color-thief-browser": "^2.0.2",
     "colorthief": "^2.6.0",
+    "lucide-react": "^0.489.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",

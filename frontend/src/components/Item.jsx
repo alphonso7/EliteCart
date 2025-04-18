@@ -9,6 +9,7 @@ const Item = (props) => {
         <p className='overflow-clip text-stone-950 pt-2 font-serif ' >{props.name}</p>
         <p className='line-through' > INR {props.oldPrice} </p>
         <p className='text font-bold' >INR {props.newPrice} </p>
+        <p className='text-blue-600 font-semibold ' >Free Delivery</p>
       </div>
     </div>
   )

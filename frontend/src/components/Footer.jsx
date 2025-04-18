@@ -34,7 +34,7 @@ import pintester_icon from '../assets/pintester_icon.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 text-gray-800 mt-10 shadow-inner">
+    <footer className="bg-gray-300 text-gray-800 mt-10 shadow-inner">
       {/* Main Footer Grid */}
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8 text-sm">
         

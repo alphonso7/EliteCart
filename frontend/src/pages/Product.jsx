@@ -6,6 +6,7 @@ import ProductDisplay from '../components/ProductDisplay'
 import RelatedProducts from '../components/RelatedProducts'
 import Footer from '../components/Footer'
 import {useMemo} from "react";
+import Navbar from '../components/Navbar'
 
 const Product = () => {
   
@@ -24,10 +25,11 @@ const Product = () => {
     return <p>Product not found</p>;
   }
   return (
-    <div >
+    <div className='bg-gray-200' >
+      <Navbar/>
       <Breadcrumb product_name={product.name} />
       {/* <img src={product.image} alt="" />- */}
-      <ProductDisplay productId = {ProductId} productName= {product.name} productOldPrice = {product.oldPrice} productNewPrice = {product.newPrice} productImage = {product.image} />
+      <ProductDisplay productId = {ProductId} productName= {product.name} productOldPrice = {product.old_price} productNewPrice = {product.new_price} productImage = {product.image} />
       <RelatedProducts selectedProduct={memoizedProduct} />
       <Footer/>
     </div>

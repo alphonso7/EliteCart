@@ -34,7 +34,7 @@ const Banner = () => {
           New Collections
         </h1>
         <p className="text-xl sm:text-2xl text-gray-700 font-serif">Give it a try</p>
-        <button className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
+        <button onClick={window.scrollTo({bottom: 0, behavior: 'smooth'})} className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
           Explore Now
         </button>
       </div>

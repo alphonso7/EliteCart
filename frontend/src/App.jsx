@@ -17,7 +17,7 @@ function App() {
     <>
       <div className='w-100 sm:w-auto md:w-auto' >
         <BrowserRouter>
-        <Navbar/>
+        {/* <Navbar/> */}
         <Routes>
           <Route path='/' element={<Shop/>} ></Route>
           <Route path='/Shop' element={<Shop/>} ></Route>

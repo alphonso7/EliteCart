@@ -19,6 +19,9 @@ const Popular = () => {
         <hr className='border-gray-500 my-4' />
       </div>
       <div className="items justify-items-center">
+        {/* <div className="from justify-self-start pl-10 text-black-300 font-semibold">
+          From INR 50
+        </div> */}
         {popular.map((item, i) =>{
             return <Item key={i} id= {item.id} name={item.name} image = {item.image} oldPrice = {item.old_price} newPrice={item.new_price} />
         })}

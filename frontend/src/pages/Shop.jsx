@@ -50,11 +50,21 @@ import NewCollections from '../components/NewCollections';
 import home_banner from '../assets/home_banner.jpg';
 import Item from '../components/Item';
 import { ShopContext } from '../Context/ShopContext';
+import banner_kids from '../assets/banner_kids.png';
+import banner_mens from '../assets/banner_mens.png';
+import banner_women from '../assets/banner_women.png';
+import ImageSlider from '../components/ImageSlider';
+import Navbar from '../components/Navbar';
+import Categories from '../components/Categories';
 
 const Shop = () => {
   const { filteredProducts, searchQuery } = useContext(ShopContext);
+  const images = [banner_kids, banner_mens, banner_women, home_banner];
 
   return (
+    <>
+    <Navbar/>
+    <Categories/>
     <div className="bg-white text-gray-800">
       {/* Products Grid */}
       <section className=" sm:px-8 md:px-16">
@@ -80,6 +90,10 @@ const Shop = () => {
         )}
       </section>
 
+      <div className="p-4">
+          <ImageSlider images={images} interval={3000} />
+      </div>
+
       {/* Hero / Banner */}
       <Banner />
 
@@ -100,6 +114,7 @@ const Shop = () => {
       {/* New Collections Section */}
       <section className="px-4 sm:px-8 md:px-16 py-10">
         <NewCollections />
+
       </section>
 
       {/* Newsletter */}
@@ -108,6 +123,7 @@ const Shop = () => {
       {/* Footer */}
       <Footer />
     </div>
+    </>
   );
 };
 

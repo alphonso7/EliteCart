@@ -179,8 +179,9 @@ const RelatedProducts = ({ selectedProduct }) => {
 
     return (
         <div>
-            <h1 className="text-2xl font-semibold text-gray-600 justify-self-center ">Related Products</h1>
-            <div className="flex justify-center my-4">
+            <hr className="border-gray-300 my-4" />
+            <h1 className="text-2xl font-semibold text-gray-600 justify-self-start pl-10 ">You might be interested in</h1>
+            <div className="flex justify-self-end pr-10 mb-6">
                 {showViewSimilarButton && (
                     <button
                         className="bg-purple-500 text-white px-4 py-2 rounded shadow"
@@ -222,6 +223,8 @@ const RelatedProducts = ({ selectedProduct }) => {
                 </div>
 
             </div>
+            <hr className="border-gray-300 my-4" />
+            
 
             <h2 className="text-xl font-semibold text-gray-600 justify-self-center " >{mood}</h2>
             {avgColorDistance && (
@@ -233,7 +236,7 @@ const RelatedProducts = ({ selectedProduct }) => {
             )}
 
 
-            <hr className="border-gray-300 my-4" />
+
             <div className="products grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-6">
                 {relatedProducts.length > 0 ? (
                     relatedProducts.map((item) => (
