@@ -8,7 +8,7 @@ export const ShopContext = createContext(null)
 
 const getDefaultCart = ()=>{
     let cart = {}
-    for (let i = 0; i < 10+1; i++) {
+    for (let i = 0; i < 100+1; i++) {
         cart[i] = 0;
         
     }
@@ -27,6 +27,16 @@ const ShopContextProvider = (props) =>{
         return savedCart ? JSON.parse(savedCart) : getDefaultCart();
     }   
     );
+    const [sizeMap, setSizeMap] = useState(() => {
+        const savedSizes = localStorage.getItem("sizeMap");
+        return savedSizes ? JSON.parse(savedSizes) : {};
+      });
+      
+
+    const addSizeToMap = (itemId, size) => {
+        setSizeMap((prev) => ({ ...prev, [itemId]: size }));
+      };
+      
 
     useEffect(() => {
         fetch('http://localhost:3000/allproducts')
@@ -50,9 +60,28 @@ const ShopContextProvider = (props) =>{
         localStorage.setItem("cartItems", JSON.stringify(cartItems));
     }, [cartItems]);
 
-    const addToCart = (itemId) =>{
+    useEffect(() => {
+        localStorage.setItem("sizeMap", JSON.stringify(sizeMap));
+      }, [sizeMap]);
+      
+
+    const addToCart = (itemId, selectedSize) =>{
+        console.log(itemId);
+        console.log(selectedSize);
+        console.log(typeof(itemId));
         setcartItems((prev) => ({...prev, [itemId]:(prev[itemId] || 0)+1}));
-        // console.log(cartItems);
+        // setcartItems((prev) => {
+        //     const existingItem = prev[itemId] || { quantity: 0, size: selectedSize };
+        //     console.log(existingItem);
+        //     return {
+        //         ...prev,
+        //         [itemId]: {
+        //             quantity: existingItem.quantity + 1,
+        //             size: selectedSize || existingItem.size,
+        //         },
+        //     };
+        // });
+        console.log(cartItems);
         if(localStorage.getItem('auth-token')){
             fetch('http://localhost:3000/addToCart', {
                 method: 'POST',
@@ -61,7 +90,7 @@ const ShopContextProvider = (props) =>{
                     'auth-token': `${localStorage.getItem('auth-token')}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({"itemId": itemId})
+                body: JSON.stringify({"itemId": itemId, "size": selectedSize})
             })
             .then((resp) => resp.json())
             .then((data) => console.log(data));
@@ -107,7 +136,7 @@ const ShopContextProvider = (props) =>{
         return totItems;
     }
 
-    const contextValue = {all_products, cartItems, addToCart, removeFromCart, getTotalCartAmount, getTotalCartItems, filteredProducts, searchQuery, setSearchQuery};
+    const contextValue = {all_products, cartItems, addToCart, removeFromCart, getTotalCartAmount, getTotalCartItems, filteredProducts, searchQuery, setSearchQuery, sizeMap, addSizeToMap};
 
 
 

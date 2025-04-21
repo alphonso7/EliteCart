@@ -4,57 +4,41 @@ import remove_icon from '../assets/cart_cross_icon.png'
 import { useNavigate } from 'react-router-dom'
 
 const CartItems = () => {
-    const { all_products, cartItems, removeFromCart, getTotalCartAmount } = useContext(ShopContext);
+    const { all_products, cartItems, removeFromCart, getTotalCartAmount, sizeMap } = useContext(ShopContext);
 
     const navigate = useNavigate();
 
     const handleCheckout = async () => {
         const authToken = localStorage.getItem("auth-token");
-    
+
         if (!authToken) {
             navigate("/signup");
             return;
         }
 
-    // console.log("🛒 Cart Items Before Sending:", cartItems); 
-        
-    //     const validCartItems = Object.fromEntries(
-    //         Object.entries(cartItems).filter(([productId, quantity]) => 
-    //             productId.length === 24 && quantity > 0 // ✅ Only allow valid MongoDB ObjectId (24 characters)
-    //         )
-    //     );
 
-    //     if (Object.keys(validCartItems).length === 0) {
-    //         alert("No valid products in the cart.");
-    //         return;
-    //     }
-    
-    //     console.log("Sending valid cart items:", validCartItems);
-    // console.log(validCartItems)
 
-   
+        console.log(cartItems);
+        const filteredCartItems = Object.fromEntries(
+            Object.entries(cartItems).filter(([id, quantity]) => quantity > 0)
+        );
 
-    console.log(cartItems);
-    const filteredCartItems = Object.fromEntries(
-        Object.entries(cartItems).filter(([id, quantity]) => quantity > 0)
-    );
+        // const formattedCartItems = Object.fromEntries(
+        //     Object.entries(filteredCartItems).map(([key, value]) => [Number(key), value]) // Convert keys to numbers
+        // );
 
-    // const formattedCartItems = Object.fromEntries(
-    //     Object.entries(filteredCartItems).map(([key, value]) => [Number(key), value]) // Convert keys to numbers
-    // );
-
-    const formattedCartItems = Object.fromEntries(
+        const formattedCartItems = Object.fromEntries(
             Object.entries(filteredCartItems)// Convert keys to numbers
         );
-        
-    console.log("✅ Sending filtered cart items:", filteredCartItems);
-    console.log(formattedCartItems)
-    console.log("🛒 Final Cart Data Being Sent:", JSON.stringify(formattedCartItems, null, 2));
 
-    
-    
+        console.log("✅ Sending filtered cart items:", filteredCartItems);
+        console.log(formattedCartItems)
+        console.log("🛒 Final Cart Data Being Sent:", JSON.stringify(formattedCartItems, null, 2));
+
+
+
         try {
-            const response = await fetch("http://localhost:3000/create-order", { 
+            const response = await fetch("http://localhost:3000/create-order", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -62,10 +46,10 @@ const CartItems = () => {
                 },
                 body: JSON.stringify(formattedCartItems),
             });
-    
+
             const data = await response.json();
             console.log("Checkout Response:", data); // ✅ Debugging log
-    
+
             if (data.success) {
                 navigate("/yourorders");
             } else {
@@ -76,7 +60,7 @@ const CartItems = () => {
             alert("An error occurred while placing the order. Check the console for details.");
         }
     };
-    
+
 
     return (
         <div className='cartitems p-4 sm:m-10' >
@@ -91,19 +75,22 @@ const CartItems = () => {
             <hr />
             {all_products.map((e) => {
                 if (cartItems[e.id] > 0) {
-                        return (
-                    <div key={e.id}>
-                    <div className="individual-item flex justify-around ">
-                        <img className='w-24 h-auto object-contain' src={e.image} alt={e.name} />
-                        <p className='overflow-clip w-24 text-center' >{e.name}</p>
-                        <p className='text-gray-700 font-medium' >${e.new_price}</p>
-                        <p>{cartItems[e.id]}</p>
-                        <p>${(e.new_price * cartItems[e.id]).toFixed(2)}</p>
-                        <img className='h-4 w-4 cursor-pointer hover:opacity-70 mt-5' onClick={() => removeFromCart(e.id)} src={remove_icon} alt="Remove" />
-                    </div>
-                    <hr />
-                    </div>
-                );
+                    return (
+                        <div key={e.id}>
+                            <div className="individual-item flex justify-around ">
+                                <img className='w-24 h-auto object-contain' src={e.image} alt={e.name} />
+                                <p className='overflow-clip w-24 text-center' >{e.name}
+                                {sizeMap[e.id] && (
+                                        <span className="block text-xs text-gray-500">Size: {sizeMap[e.id]}</span>
+                                    )}
+                                </p>
+                                <p className='text-gray-700 font-medium' >${e.new_price}</p>
+                                <p>${(e.new_price * cartItems[e.id]).toFixed(2)}</p>
+                                <img className='h-4 w-4 cursor-pointer hover:opacity-70 mt-5' onClick={() => removeFromCart(e.id)} src={remove_icon} alt="Remove" />
+                            </div>
+                            <hr />
+                        </div>
+                    );
                 }
                 return null;
             })}
@@ -113,9 +100,9 @@ const CartItems = () => {
                 <hr className="my-2 border-gray-300" />
                 <p className="text-xl font-semibold">Total: <span className="text-gray-800">${getTotalCartAmount()}</span></p>
             </div>
-            <div> 
+            <div>
                 <button onClick={handleCheckout} className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
-                     PROCEED TO CHECKOUT
+                    PROCEED TO CHECKOUT
                 </button>
             </div>
         </div>

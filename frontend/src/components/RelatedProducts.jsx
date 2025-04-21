@@ -55,28 +55,7 @@ const RelatedProducts = ({ selectedProduct }) => {
         if (!mood || allProducts.length === 0) return;
         const moodColor = moodColors[mood];
 
-        // const getCenterColor = (imageSrc) => {
-        //     return new Promise((resolve, reject) => {
-        //         const img = new Image();
-        //         img.crossOrigin = "Anonymous";
-        //         img.src = imageSrc;
-        //         img.onload = () => {
-        //             const canvas = document.createElement("canvas");
-        //             const ctx = canvas.getContext("2d");
-        //             canvas.width = img.width;
-        //             canvas.height = img.height;
-        //             ctx.drawImage(img, 0, 0, img.width, img.height);
-        //             const pixel = ctx.getImageData(
-        //                 Math.floor(img.width / 2),
-        //                 Math.floor(img.height / 2),
-        //                 1,
-        //                 1
-        //             ).data;
-        //             resolve({ r: pixel[0], g: pixel[1], b: pixel[2] });
-        //         };
-        //         img.onerror = reject;
-        //     });
-        // };
+
         const getAverageCenterColor = (imageSrc) => {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -109,13 +88,6 @@ const RelatedProducts = ({ selectedProduct }) => {
         };
         
 
-        // const colorDistance = (c1, c2) => {
-        //     return Math.sqrt(
-        //         Math.pow(c1.r - c2.r, 2) +
-        //         Math.pow(c1.g - c2.g, 2) +
-        //         Math.pow(c1.b - c2.b, 2)
-        //     );
-        // };
         const colorDistance = (c1, c2) => {
             const lab1 = chroma.rgb(c1.r, c1.g, c1.b).lab();
             const lab2 = chroma.rgb(c2.r, c2.g, c2.b).lab();
@@ -127,26 +99,6 @@ const RelatedProducts = ({ selectedProduct }) => {
             return deltaE;
         };
         
-        // const fetchByMood = async () => {
-        //     const moodFiltered = await Promise.all(
-        //         allProducts.map(async (p) => {
-        //             const color = await getCenterColor(p.image);
-        //             const dist = colorDistance(color, moodColor);
-        //             return { ...p, distance: dist, color };
-        //         })
-        //     );
-            
-        //     moodFiltered.sort((a, b) => a.distance - b.distance);
-        //     const topProducts = moodFiltered.slice(0, 10);
-            
-        //     // Calculate average color distance
-        //     const avgDistance = topProducts.length > 0
-        //         ? (topProducts.reduce((sum, p) => sum + p.distance, 0) / topProducts.length).toFixed(2)
-        //         : null;
-        
-        //     setAvgColorDistance(avgDistance);
-        //     setRelatedProducts(topProducts);
-        // };
         const fetchByMood = async () => {
             const moodFiltered = await Promise.all(
                 allProducts.map(async (p) => {
@@ -178,84 +130,62 @@ const RelatedProducts = ({ selectedProduct }) => {
     }, [mood, allProducts]);
 
     return (
-        <div>
-            <hr className="border-gray-300 my-4" />
-            <h1 className="text-2xl font-semibold text-gray-600 justify-self-start pl-10 ">You might be interested in</h1>
-            <div className="flex justify-self-end pr-10 mb-6">
-                {showViewSimilarButton && (
-                    <button
-                        className="bg-purple-500 text-white px-4 py-2 rounded shadow"
-                        onClick={() => {
-                            setMood(null); // Reset mood to fetch similar products
-                            setShowViewSimilarButton(false); // Hide the button after clicking
-                        }}
-                    >
-                        View Similar
-                    </button>
-                )}
-
-                <div className="ml-4">
-                    <button
-                        className="bg-purple-500 text-white px-4 py-2 rounded shadow"
-                        onClick={() => {
-                            setShowMoodOptions(!showMoodOptions);
-                            setShowViewSimilarButton(true); // Show the "View Similar" button
-                        }}
-                    >
-                        How are you feeling today?
-                    </button>
-                    {showMoodOptions && (
-                        <div className="absolute bg-white border mt-2 shadow-md rounded p-2 z-10">
-                            {Object.keys(moodColors).map((m) => (
-                                <button
-                                    key={m}
-                                    className="block text-left w-full px-2 py-1 hover:bg-gray-100"
-                                    onClick={() => {
-                                        setMood(m);
-                                        setShowMoodOptions(false);
-                                    }}
-                                >
-                                    {m.charAt(0).toUpperCase() + m.slice(1)}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
+        <div className="flex px-6 py-4 gap-6">
+          {/* LEFT FILTER PANEL */}
+          <div className="w-64 bg-white p-4 rounded shadow h-fit border border-gray-200">
+            <h2 className="text-lg font-semibold mb-4">How are you feeling today?</h2>
+            <div className="flex flex-col gap-2">
+              {Object.keys(moodColors).map((m) => (
+                <button
+                  key={m}
+                  className={`text-left px-3 py-2 rounded ${
+                    mood === m ? "bg-purple-600 text-white" : "bg-gray-100 hover:bg-gray-200"
+                  }`}
+                  onClick={() => setMood(m)}
+                >
+                  {m.charAt(0).toUpperCase() + m.slice(1)}
+                </button>
+              ))}
             </div>
-            <hr className="border-gray-300 my-4" />
-            
-
-            <h2 className="text-xl font-semibold text-gray-600 justify-self-center " >{mood}</h2>
-            {avgColorDistance && (
-                <div className="text-center mb-4">
-                    <p className="text-sm text-gray-600">
-                        🎯 <strong>Average Color Distance:</strong> {avgColorDistance}
-                    </p>
-                </div>
+            {mood && (
+              <button
+                className="mt-6 w-full bg-purple-500 text-white px-4 py-2 rounded shadow"
+                onClick={() => setMood(null)}
+              >
+                🔄 View Similar
+              </button>
             )}
-
-
-
-            <div className="products grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-6">
-                {relatedProducts.length > 0 ? (
-                    relatedProducts.map((item) => (
-                        <Item
-                            key={item.id}
-                            id={item.id}
-                            name={item.name}
-                            image={item.image}
-                            newPrice={item.new_price}
-                            oldPrice={item.old_price}
-                        />
-                    ))
-                ) : (
-                    <p className="text-center text-gray-500">No related products found.</p>
-                )}
+          </div>
+    
+          {/* RIGHT PRODUCT PANEL */}
+          <div className="flex-1">
+            <h1 className="text-2xl font-semibold text-gray-700 mb-4">You might be interested in</h1>
+            {mood && avgColorDistance && (
+              <div className="text-gray-600 mb-4">
+                🎯 <strong>Average Color Distance:</strong> {avgColorDistance}
+              </div>
+            )}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-6">
+              {relatedProducts.length > 0 ? (
+                relatedProducts.map((item) => (
+                  <Item
+                    key={item.id}
+                    id={item.id}
+                    name={item.name}
+                    image={item.image}
+                    newPrice={item.new_price}
+                    oldPrice={item.old_price}
+                  />
+                ))
+              ) : (
+                <p className="text-center text-gray-500 col-span-full">
+                  No related products found.
+                </p>
+              )}
             </div>
+          </div>
         </div>
-
-    );
-};
+      );
+    };
 
 export default RelatedProducts;
