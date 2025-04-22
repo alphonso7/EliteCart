@@ -7,8 +7,9 @@ import { ShopContext } from '../Context/ShopContext';
 const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
 const ProductDisplay = (props) => {
-  const { addToCart, addSizeToMap } = useContext(ShopContext);
+  const { addToCart, addSizeToMap, addQuantityToMap } = useContext(ShopContext);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedQuantity, setSelectedQuantity] = useState(1); // default 1
 
   return (
     <>
@@ -81,6 +82,21 @@ const ProductDisplay = (props) => {
             </div>
           </div>
 
+          {/* Quantity */}
+          <label className="block mt-4 font-semibold">Select Quantity:</label>
+          <select
+            value={selectedQuantity}
+            onChange={(e) => setSelectedQuantity(Number(e.target.value))}
+            className="border p-2 rounded mt-1"
+          >
+            {[...Array(10)].map((_, i) => (
+              <option key={i + 1} value={i + 1}>
+                {i + 1}
+              </option>
+            ))}
+          </select>
+
+
           {/* Add to Cart */}
           <div>
             <button
@@ -92,7 +108,8 @@ const ProductDisplay = (props) => {
 
                 console.log("✅ Selected Size:", selectedSize);
                 addSizeToMap(props.productId, selectedSize);
-                addToCart(props.productId, selectedSize);
+                addQuantityToMap(props.productId, selectedQuantity);
+                addToCart(props.productId, selectedSize, selectedQuantity);
               }}
               className="px-6 py-2 bg-red-500 text-white rounded hover:bg-gray-300 hover:text-black transition font-semibold"
             >

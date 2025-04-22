@@ -36,6 +36,19 @@ const ShopContextProvider = (props) =>{
     const addSizeToMap = (itemId, size) => {
         setSizeMap((prev) => ({ ...prev, [itemId]: size }));
       };
+
+      const [quantityMap, setQuantityMap] = useState(() => {
+        const saved = localStorage.getItem("quantityMap");
+        return saved ? JSON.parse(saved) : {};
+      });
+      
+    const addQuantityToMap = (itemId, qty) => {
+        setQuantityMap((prev) => ({ ...prev, [itemId]: qty }));
+      };
+      
+    useEffect(() => {
+        localStorage.setItem("quantityMap", JSON.stringify(quantityMap));
+      }, [quantityMap]);
       
 
     useEffect(() => {
@@ -63,13 +76,19 @@ const ShopContextProvider = (props) =>{
     useEffect(() => {
         localStorage.setItem("sizeMap", JSON.stringify(sizeMap));
       }, [sizeMap]);
+
       
 
-    const addToCart = (itemId, selectedSize) =>{
+    const addToCart = (itemId, selectedSize, selectedQuantity = 1) =>{
         console.log(itemId);
         console.log(selectedSize);
         console.log(typeof(itemId));
-        setcartItems((prev) => ({...prev, [itemId]:(prev[itemId] || 0)+1}));
+        // setcartItems((prev) => ({...prev, [itemId]:(prev[itemId] || 0)+1}));
+        setcartItems((prev) => ({
+            ...prev,
+            [itemId]: (prev[itemId] || 0) + (selectedQuantity || 1),
+          }));
+          
         // setcartItems((prev) => {
         //     const existingItem = prev[itemId] || { quantity: 0, size: selectedSize };
         //     console.log(existingItem);
@@ -90,7 +109,7 @@ const ShopContextProvider = (props) =>{
                     'auth-token': `${localStorage.getItem('auth-token')}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({"itemId": itemId, "size": selectedSize})
+                body: JSON.stringify({"itemId": itemId, "size": selectedSize, "selectedQuantity" : selectedQuantity})
             })
             .then((resp) => resp.json())
             .then((data) => console.log(data));
@@ -136,7 +155,7 @@ const ShopContextProvider = (props) =>{
         return totItems;
     }
 
-    const contextValue = {all_products, cartItems, addToCart, removeFromCart, getTotalCartAmount, getTotalCartItems, filteredProducts, searchQuery, setSearchQuery, sizeMap, addSizeToMap};
+    const contextValue = {all_products, cartItems, addToCart, removeFromCart, getTotalCartAmount, getTotalCartItems, filteredProducts, searchQuery, setSearchQuery, sizeMap, addSizeToMap, quantityMap, addQuantityToMap};
 
 
 

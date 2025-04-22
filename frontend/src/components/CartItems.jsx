@@ -1,10 +1,12 @@
 import React, { useContext } from 'react'
 import { ShopContext } from '../Context/ShopContext'
-import remove_icon from '../assets/cart_cross_icon.png'
+// import remove_icon from '../assets/cart_cross_icon.png'
+import empty_cart from '../assets/empty_cart.jpg';
 import { useNavigate } from 'react-router-dom'
+import Footer from './Footer';
 
 const CartItems = () => {
-    const { all_products, cartItems, removeFromCart, getTotalCartAmount, sizeMap } = useContext(ShopContext);
+    const { all_products, cartItems, removeFromCart, getTotalCartAmount, sizeMap, addToCart } = useContext(ShopContext);
 
     const navigate = useNavigate();
 
@@ -15,7 +17,6 @@ const CartItems = () => {
             navigate("/signup");
             return;
         }
-
 
 
         console.log(cartItems);
@@ -61,51 +62,109 @@ const CartItems = () => {
         }
     };
 
+    const totalAmount = getTotalCartAmount();
+
 
     return (
-        <div className='cartitems p-4 sm:m-10' >
-            <div className="cartitemsFormat grid grid-cols-6 justify-items-center gap-4 py-2 border-b font-semibold">
-                <p>Products</p>
-                <p className='sm:pl-40' >Title</p>
-                <p className='sm:pl-40' >Price</p>
-                <p className='sm:pl-20' >Quantity</p>
-                <p className='sm:pl-10' >Total</p>
-                <p>Remove</p>
-            </div>
-            <hr />
-            {all_products.map((e) => {
-                if (cartItems[e.id] > 0) {
-                    return (
-                        <div key={e.id}>
-                            <div className="individual-item flex justify-around ">
-                                <img className='w-24 h-auto object-contain' src={e.image} alt={e.name} />
-                                <p className='overflow-clip w-24 text-center' >{e.name}
-                                {sizeMap[e.id] && (
-                                        <span className="block text-xs text-gray-500">Size: {sizeMap[e.id]}</span>
-                                    )}
-                                </p>
-                                <p className='text-gray-700 font-medium' >${e.new_price}</p>
-                                <p>${(e.new_price * cartItems[e.id]).toFixed(2)}</p>
-                                <img className='h-4 w-4 cursor-pointer hover:opacity-70 mt-5' onClick={() => removeFromCart(e.id)} src={remove_icon} alt="Remove" />
-                            </div>
-                            <hr />
+
+        <div className="cart-container p-4">
+            {totalAmount === 0 ? (
+                <div className="text-center text-gray-500 text-lg font-normal mt-6 justify-items-center">
+                    <img src={empty_cart} alt="cart" />
+                    <p>Your cart is empty</p>
+                    <p>Add some items first!</p>
+                    <button onClick={() => navigate("/shop")} className='mt-4 w-50 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition' >Shop Now</button>
+                </div>
+            ) : (
+
+                <>
+                    <div className='cartitems flex felx-col p-4 sm:m-10 bg-gray-200' >
+                        {/* <div className="cartitemsFormat grid grid-cols-6 justify-items-center gap-4 py-2 border-b font-semibold">
+                            <p>Products</p>
+                            <p className='sm:pl-40' >Title</p>
+                            <p className='sm:pl-40' >Price</p>
+                            <p className='sm:pl-20' >Quantity</p>
+                            <p className='sm:pl-10' >Total</p>
+                            <p>Remove</p>
+                        </div> */}
+                        {/* <hr /> */}
+                        <div>
+                        {all_products.map((e) => {
+                            if (cartItems[e.id] > 0) {
+                                return (
+                                    <div key={e.id}>
+                                        <div className="flex items-start gap-4 p-4 mb-4 w-3xl border rounded-lg shadow-sm bg-white">
+                                            <img className="w-28 h-28 object-contain" src={e.image} alt={e.name} />
+
+                                            <div className="flex-1">
+                                                <h2 className="text-lg font-medium">{e.name}</h2>
+                                                {sizeMap[e.id] && (
+                                                    <p className="text-sm text-gray-500 mb-1">Size: {sizeMap[e.id]}</p>
+                                                )}
+                                                <p className="text-sm text-gray-700 mb-1">Price: ₹{e.new_price}</p>
+                                                <p className="text-sm text-gray-700 mb-2">Total: ₹{(e.new_price * cartItems[e.id]).toFixed(2)}</p>
+
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        onClick={() => removeFromCart(e.id)}
+                                                        className="w-8 h-8 rounded border border-gray-400 text-xl flex items-center justify-center hover:bg-gray-100"
+                                                    >
+                                                        -
+                                                    </button>
+                                                    <span className="w-6 text-center">{cartItems[e.id]}</span>
+                                                    <button
+                                                        onClick={() => addToCart(e.id)}
+                                                        className="w-8 h-8 rounded border border-gray-400 text-xl flex items-center justify-center hover:bg-gray-100"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* <hr /> */}
+                                    </div>
+                                );
+                            }
+                            return null;
+                        })}
                         </div>
-                    );
-                }
-                return null;
-            })}
-            <div className="cartTotal bg-gray-100 p-6 rounded-lg shadow-md text-center max-w-sm mx-auto mt-6">
-                <h1 className="text-lg font-semibold">Subtotal: <span className="text-gray-700">${getTotalCartAmount()}</span></h1>
-                <p className="text-gray-600 mt-1">Shipping Charges: <span className="font-medium text-green-600">Free</span></p>
-                <hr className="my-2 border-gray-300" />
-                <p className="text-xl font-semibold">Total: <span className="text-gray-800">${getTotalCartAmount()}</span></p>
-            </div>
-            <div>
-                <button onClick={handleCheckout} className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
-                    PROCEED TO CHECKOUT
-                </button>
-            </div>
-        </div>
+                        <div className="cart-summary sticky top-20 bg-white p-6 rounded-lg shadow-lg w-full sm:w-80 mx-auto sm:ml-auto sm:mr-0 mt-6">
+                            <h2 className="text-xl font-semibold mb-4 text-gray-800">Price Details</h2>
+
+                            <div className="flex justify-between mb-2">
+                                <span>Subtotal</span>
+                                <span>₹{getTotalCartAmount()}</span>
+                            </div>
+
+                            <div className="flex justify-between mb-2">
+                                <span>Shipping Charges</span>
+                                <span className="text-green-600 font-medium">Free</span>
+                            </div>
+
+                            <hr className="my-3 border-gray-300" />
+
+                            <div className="flex justify-between text-lg font-semibold mb-4">
+                                <span>Total</span>
+                                <span>₹{getTotalCartAmount()}</span>
+                            </div>
+
+                            <button
+                                onClick={handleCheckout}
+                                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+                            >
+                                PLACE ORDER
+                            </button>
+                        </div>
+
+
+                    </div>
+                </>
+
+            )
+            }
+        </div >
+
     )
 }
 
