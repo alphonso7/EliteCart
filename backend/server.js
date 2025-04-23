@@ -207,12 +207,59 @@ app.post("/login", async (req, res) => {
       };
       const token = jwt.sign(data, "secret_ecom");
        
-      res.json({ success: true, token });
+      res.json({ success: true, token, userId: user.id });
     } else {
       res.json({ success: false, errors: "Wrong password" });
     }
   } else {
     res.json({ success: false, errors: "Wrong EmailId" });
+  }
+});
+
+// Update user profile
+app.put("/user/profile", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { name, email, date } = req.body;
+
+    const updatedUser = await Users.findByIdAndUpdate(
+      userId,
+      { name, email, date },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user: updatedUser });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+app.get('/api/user/:id', async (req, res) => {
+  try {
+    const user = await Users.findById(req.params.id).select('name email date address');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+app.put('/api/user/:id', async (req, res) => {
+  const { name, email, date, address } = req.body;
+  try {
+    const user = await Users.findByIdAndUpdate(
+      req.params.id,
+      { name, email, date, address },
+      { new: true, runValidators: true }
+    ).select('name email date address');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update user' });
   }
 });
 

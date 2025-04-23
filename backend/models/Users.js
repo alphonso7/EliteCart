@@ -19,7 +19,10 @@ const UsersSchema = new mongoose.Schema({
         type:Date,
         default: Date.now,
     },
-    isAdmin: { type: Boolean, default: false }
+    isAdmin: { type: Boolean, default: false },
+    gender: { type: String, enum: ['Male', 'Female', 'Other'], default: 'Other' },
+    address: { type: String, default: '' }
+
 })
 
 const Users = mongoose.model("Users", UsersSchema);

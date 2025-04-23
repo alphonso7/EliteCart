@@ -5,6 +5,9 @@ import { ShopContext } from '../Context/ShopContext';
 import search_icon from '../assets/search_icon.png';
 import Categories from '../components/Categories';
 import { useNavigate } from 'react-router-dom';
+import user_icon from '../assets/user_icon.png';
+import order_icon from '../assets/order_icon.png';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const { searchQuery, setSearchQuery, getTotalCartItems } = useContext(ShopContext);
@@ -70,31 +73,43 @@ const Navbar = () => {
                 className="text-2xl hover:text-blue-600"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
-                {/* <FaUserCircle /> */}
+                <img className='w-10 h-auto' src={user_icon} alt="icon" />
               </button>
 
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-md z-10 text-left">
-                  <Link
-                    to="/yourorders"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                  >
-                    My Orders
-                  </Link>
-                  <Link
-                    to="/myprofile"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                  >
-                    My Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
+              <AnimatePresence>
+                {/* <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-md z-10 text-left"> */}
+                  {dropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-md z-10 text-left"
+                    >
+
+                      <Link
+                        to="/yourorders"
+                        className=" flex flex-row px-4 py-2 hover:bg-gray-100"
+                      >
+                        <img className='w-5 h-auto mr-2' src={order_icon} alt="icon" />
+                        My Orders
+                      </Link>
+                      <Link
+                        to="/myprofile"
+                        className="flex flex-row px-4 py-2 hover:bg-gray-100"
+                      >
+                        <img className='w-5 h-auto mr-2' src={user_icon} alt="icon" />
+                        My Profile
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                      >
+                        Logout
+                      </button>
+                    </motion.div>
+                  )}
+              </AnimatePresence>
             </div>
           ) : (
             <Link to="/signup" className="hover:text-blue-600">

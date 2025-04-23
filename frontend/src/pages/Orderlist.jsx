@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Categories from "../components/Categories";
+import arrow_icon from '../assets/breadcrum_arrow.png'
+import Footer from "../components/Footer";
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
@@ -43,6 +47,14 @@ const OrderList = () => {
     }, [navigate]); // ✅ Redirect immediately if not logged in
 
     return (
+        <>
+        <Navbar/>
+        <Categories/>
+            <div className='flex font-serif font-medium ml-5 mt-2 gap-3 text-gray-400' >
+                HOME <img className='h-5 w-auto' src={arrow_icon} alt="" /> 
+                MY PROFILE <img className='h-5 w-auto' src={arrow_icon} alt="" /> 
+                MY ORDERS  
+            </div>
         <div className="container mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4">Your Orders</h2>
             {orders.length === 0 ? (
@@ -53,7 +65,7 @@ const OrderList = () => {
                         <div key={order._id} className="bg-white p-4 rounded-lg shadow">
                             <h3 className="text-lg font-semibold">Order ID: {order._id}</h3>
                             <p className="text-gray-600">Status: <span className="font-bold">{order.status}</span></p>
-                            <p className="text-gray-600">Total: ${order.totalAmount.toFixed(2)}</p>
+                            <p className="text-gray-600">Total: INR {order.totalAmount.toFixed(2)}</p>
                             <ul className="mt-2">
                                 {order.items.map((item) => (
                                     <li key={item.productId._id} className="flex items-center space-x-3">
@@ -67,6 +79,8 @@ const OrderList = () => {
                 </div>
             )}
         </div>
+        <Footer/>
+        </>
     );
 };
 
