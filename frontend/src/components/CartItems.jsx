@@ -36,30 +36,31 @@ const CartItems = () => {
         console.log(formattedCartItems)
         console.log("🛒 Final Cart Data Being Sent:", JSON.stringify(formattedCartItems, null, 2));
 
+        navigate("/checkout");
 
+        // try {
+        //     const response = await fetch("http://localhost:3000/create-order", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //             "auth-token": authToken,
+        //         },
+        //         body: JSON.stringify(formattedCartItems),
+        //     });
 
-        try {
-            const response = await fetch("http://localhost:3000/create-order", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "auth-token": authToken,
-                },
-                body: JSON.stringify(formattedCartItems),
-            });
+        //     const data = await response.json();
+        //     console.log("Checkout Response:", data); // ✅ Debugging log
 
-            const data = await response.json();
-            console.log("Checkout Response:", data); // ✅ Debugging log
-
-            if (data.success) {
-                navigate("/yourorders");
-            } else {
-                alert("Failed to place order: " + (data.message || "Unknown error"));
-            }
-        } catch (error) {
-            console.error("Checkout error:", error); // ✅ Log full error
-            alert("An error occurred while placing the order. Check the console for details.");
-        }
+        //     if (data.success) {
+        //         // navigate("/yourorders");
+        //         navigate("/checkout");
+        //     } else {
+        //         alert("Failed to place order: " + (data.message || "Unknown error"));
+        //     }
+        // } catch (error) {
+        //     console.error("Checkout error:", error); // ✅ Log full error
+        //     alert("An error occurred while placing the order. Check the console for details.");
+        // }
     };
 
     const totalAmount = getTotalCartAmount();
