@@ -389,6 +389,21 @@ app.put("/admin/orders/:orderId", async (req, res) => {
   }
 });
   
+// api for checkout page
+app.get("/api/checkout", async (req, res) =>{
+  try{
+    const user = await Users.findById(req.user.id).select('name email address');
+    if(!user) return res.status(404).json({error: 'User not found'});
+    res.json({
+      name: user.name,
+      email: user.email,
+      address: user.address,
+    });
+  } catch(error) {
+    console.error("Error creating order");
+    res.status(500).json({error: 'server error'});
+  }
+})
 
 
 
