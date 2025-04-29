@@ -56,7 +56,8 @@ const OrderList = () => {
         <>
             <Navbar />
             <Categories />
-            <div className='flex font-serif font-medium ml-5 mt-2 gap-3 text-gray-400' >
+            <div className="bg-gray-100">
+            <div className='flex font-serif font-medium ml-5 mt-2 gap-3 text-gray-400 ' >
                 HOME <img className='h-5 w-auto' src={arrow_icon} alt="" />
                 MY PROFILE <img className='h-5 w-auto' src={arrow_icon} alt="" />
                 MY ORDERS
@@ -66,25 +67,8 @@ const OrderList = () => {
                 {orders.length === 0 ? (
                     <p>No orders found.</p>
                 ) : (
-                    // <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    //     {orders.map((order) => (
-                    //         <div key={order._id} className="bg-white p-4 rounded-lg shadow">
-                    //             <h3 className="text-lg font-semibold">Order ID: {order._id}</h3>
-                    //             <p className="text-gray-600">Status: <span className="font-bold">{order.status}</span></p>
-                    //             <p className="text-gray-600">Total: INR {order.totalAmount.toFixed(2)}</p>
-                    //             <ul className="mt-2">
-                    //                 {order.items.map((item) => (
-                    //                     <li key={item.productId._id} className="flex items-center space-x-3">
-                    //                         <img src={item.productId.image} alt={item.productId.name} className="w-12 h-12 object-cover"/>
-                    //                         <p>{item.productId.name} (x{item.quantity})</p>
-                    //                     </li>
-                    //                 ))}
-                    //             </ul>
-                    //         </div>
-                    //     ))}
-                    // </div>
                     <div className="main flex flex-row">
-                        <div className="w-1/4 bg-gray-100 p-4 space-y-4 mr-20">
+                        <div className="w-1/4 bg-white p-4 space-y-4 mr-20">
                             <h3 className="text-lg font-semibold">Filter by Status</h3>
                             {statuses.map(status => (
                                 <button
@@ -98,14 +82,15 @@ const OrderList = () => {
                             ))}
                         </div>
                         {/* Orders List */}
-                        <div className="grid grid-cols-1 md:grid-cols-1 gap-4 h-25">
+                        <div className="bg-white h-auto" >
+                        <div className="grid grid-cols-1 md:grid-cols-1 gap-4 ">
                             {filteredOrders.map((order) => (
-                                <div key={order._id} className=" flex flex-row bg-gray-200 p-4 rounded-lg shadow gap-20 ">
+                                <div key={order._id} className=" flex flex-row p-4 shadow gap-20 ">
                                     {/* <h3 className="text-lg font-semibold">Order ID: {order._id}</h3> */}
                                     <ul className="mt-2">
                                         {order.items.map((item) => (
                                             <li key={item.productId._id} className="flex items-center space-x-3 w-auto gap-3">
-                                                <img src={item.productId.image} alt={item.productId.name} className="w-12 h-12 object-cover" />
+                                                <img src={item.productId.image} alt={item.productId.name} className="w-20 h-20 object-cover" />
                                                 <p>{item.productId.name} (x{item.quantity})</p>
                                             </li>
                                         ))}
@@ -115,8 +100,10 @@ const OrderList = () => {
                                 </div>
                             ))}
                         </div>
+                        </div>
                     </div>
                 )}
+            </div>
             </div>
             <Footer />
         </>

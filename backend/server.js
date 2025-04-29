@@ -52,8 +52,8 @@ app.use((req, res, next) => {
 // Database connection
 mongoose
   .connect(process.env.MONGO_DB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true,
   })
   .then(() => {
     console.log("MongoDB Connected Successfully");

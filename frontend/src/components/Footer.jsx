@@ -1,30 +1,3 @@
-// import React from 'react'
-// import copyright from '../assets/copyright.png'
-// import whatsapp_icon from '../assets/whatsapp_icon.png'
-// import instagram_icon from '../assets/instagram_icon.png'
-// import pintester_icon from '../assets/pintester_icon.png'
-
-// const Footer = () => {
-//   return (
-//     <footer className="w-full bg-gray-200 font-semibold text-stone-700 mt-auto" >
-//       <div className='h-30 bg-gray-200  font-semibold text-stone-700' >
-//       <span className="copyright flex space-x-1 pt-7 justify-center">
-//         <p>Copyright </p>
-//         <img className='w-5 h-5' src={copyright} alt="" />
-//         <p>2025 EliteCart</p>
-//       </span>
-//       <div className="shareIcons flex place-self-end gap-7 pr-5 ">
-//         <img className='w-5 h-5' src={instagram_icon} alt="" />
-//         <img className='w-5 h-5' src={pintester_icon} alt="" />
-//         <img className='w-5 h-5' src={whatsapp_icon} alt="" />
-//       </div>
-//     </div>
-//     </footer>
-    
-//   )
-// }
-
-// export default Footer
 
 import React from 'react';
 import copyright from '../assets/copyright.png';
@@ -34,7 +7,7 @@ import pintester_icon from '../assets/pintester_icon.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-300 text-gray-800 mt-10 shadow-inner">
+    <footer className="bg-gray-300 text-gray-800 shadow-inner">
       {/* Main Footer Grid */}
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8 text-sm">
         

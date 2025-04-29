@@ -44,7 +44,7 @@ const UserProfile = () => {
             <Navbar />
             <Categories />
             <hr className='bg-blue-300 font-semibold' />
-            <div className="flex flex-col sm:flex-row p-6 sm:p-10 bg-blue-200 min-h-screen">
+            <div className="flex flex-col sm:flex-row p-6 sm:p-10 bg-blue-100 min-h-screen">
                 <div className="w-full sm:w-1/4 bg-white rounded-lg shadow-md p-4">
                     <div className="flex items-center space-x-4 mb-4">
                         <img
