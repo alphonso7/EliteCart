@@ -28,7 +28,6 @@ const Product = () => {
     <div className='bg-gray-200' >
       <Navbar/>
       <Breadcrumb product_name={product.name} />
-      {/* <img src={product.image} alt="" />- */}
       <ProductDisplay productId = {ProductId} productName= {product.name} productOldPrice = {product.old_price} productNewPrice = {product.new_price} productImage = {product.image} />
       <RelatedProducts selectedProduct={memoizedProduct} />
       <Footer/>

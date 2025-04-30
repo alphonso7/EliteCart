@@ -357,7 +357,7 @@ const totalAmount = orderItems.reduce((total, item) => {
 
 app.get("/admin/orders", async (req, res) => {
   try {
-      const orders = await Order.find().populate("items.productId");  
+      const orders = await Order.find().populate("items.productId", 'name');  
 
       if (!Array.isArray(orders)) {
           return res.status(500).json({ message: "Orders should be an array" });
@@ -388,6 +388,17 @@ app.put("/admin/orders/:orderId", async (req, res) => {
       res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+//api to see total users
+app.get('/totalusers', async (req, res) => {
+  try {
+    const count = await Users.countDocuments();  // counts all users
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user count' });
+  }
+});
+
   
 // api for checkout page
 app.get("/api/checkout", async (req, res) =>{

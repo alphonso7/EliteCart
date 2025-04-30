@@ -1,22 +1,24 @@
 import React from 'react'
 import './Admin.css'
 import Sidebar from '../components/Sidebar'
-import {Routes, Route} from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import AddProduct from '../components/AddProduct'
 import ListProduct from '../components/ListProduct'
 import AdminOrders from '../components/AdminOrders'
 import LoginSignup from '../../../frontend/src/pages/LoginSignup'
+import AdminHome from '../components/AdminHome'
 
 
 const Admin = () => {
   return (
     <div className='admin' >
-      <Sidebar/>
+      <Sidebar />
       <Routes>
-        <Route path='/addproduct' element={<AddProduct/>} ></Route>
-        <Route path='/listproduct' element={<ListProduct/>} ></Route>
-        <Route path="/admin/orders" element={<AdminOrders />} /><Route/>
-        <Route path="/signup" element={<LoginSignup/>} /><Route/>
+        <Route path='/' element={<AdminHome/>} ></Route>
+        <Route path='/addproduct' element={<AddProduct />} ></Route>
+        <Route path='/listproduct' element={<ListProduct />} ></Route>
+        <Route path="/admin/orders" element={<AdminOrders />} /><Route />
+        <Route path="/signup" element={<LoginSignup />} /><Route />
       </Routes>
     </div>
   )

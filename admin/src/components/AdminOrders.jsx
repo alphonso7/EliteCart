@@ -54,7 +54,7 @@ const AdminOrders = () => {
 
     return (
         <div className="admin-orders-container">
-            <h2>Admin Orders</h2>
+            <h2>Orders Status</h2>
             {orders.length === 0 ? (
                 <p className="no-orders">No orders found.</p>
             ) : (
@@ -62,7 +62,7 @@ const AdminOrders = () => {
                     <thead>
                         <tr>
                             <th>Order ID</th>
-                            <th>User</th>
+                            <th>User ID</th>
                             <th>Products</th>
                             <th>Status</th>
                             <th>Update Status</th>
@@ -71,12 +71,14 @@ const AdminOrders = () => {
                     <tbody>
                         {orders.map((order) => (
                             <tr key={order._id}>
-                                <td>{order._id}</td>
-                                <td>{order.userEmail}</td>
+                                {/* <td>{order._id}</td> */}
+                                <td>Order #{order._id.slice(-6)}</td>
+                                <td>{order.userId}</td>
                                 <td className="admin-orders-products">
                                     {order.items.map((item, index) => (
                                         <p key={index}>
-                                            {item.productName} - {item.quantity}
+                                            {item.productId?.name || 'unknown'} X {item.quantity}
+                                            {/* {item.productId} */}
                                         </p>
                                     ))}
                                 </td>

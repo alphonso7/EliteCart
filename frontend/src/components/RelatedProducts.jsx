@@ -130,15 +130,15 @@ const RelatedProducts = ({ selectedProduct }) => {
     }, [mood, allProducts]);
 
     return (
-        <div className="flex px-6 py-4 gap-6">
+        <div className="flex px-6 py-4 gap-6 bg-gray-50 min-h-screen">
           {/* LEFT FILTER PANEL */}
-          <div className="w-64 bg-white p-4 rounded shadow h-fit border border-gray-200">
-            <h2 className="text-lg font-semibold mb-4">How are you feeling today?</h2>
+          <div className="w-64 bg-white p-4 rounded-md shadow-sm h-fit border border-gray-200 sticky top-24">
+            <h2 className="text-md font-semibold text-gray-800 mb-3">How are you feeling today?</h2>
             <div className="flex flex-col gap-2">
               {Object.keys(moodColors).map((m) => (
                 <button
                   key={m}
-                  className={`text-left px-3 py-2 rounded ${
+                  className={`text-left px-3 py-2 rounded-md text-sm font-medium ${
                     mood === m ? "bg-purple-600 text-white" : "bg-gray-100 hover:bg-gray-200"
                   }`}
                   onClick={() => setMood(m)}
@@ -149,7 +149,7 @@ const RelatedProducts = ({ selectedProduct }) => {
             </div>
             {mood && (
               <button
-                className="mt-6 w-full bg-purple-500 text-white px-4 py-2 rounded shadow"
+                className="mt-6 w-full bg-purple-500 text-white px-4 py-2 rounded-md shadow hover:bg-purple-600 transition"
                 onClick={() => setMood(null)}
               >
                 🔄 View Similar
@@ -159,9 +159,9 @@ const RelatedProducts = ({ selectedProduct }) => {
     
           {/* RIGHT PRODUCT PANEL */}
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold text-gray-700 mb-4">You might be interested in</h1>
+            <h1 className="text-2xl font-semibold text-gray-800 mb-4">You might be interested in</h1>
             {mood && avgColorDistance && (
-              <div className="text-gray-600 mb-4">
+              <div className="text-sm text-gray-500 mb-4">
                 🎯 <strong>Average Color Distance:</strong> {avgColorDistance}
               </div>
             )}

@@ -1,0 +1,54 @@
+.admin-home {
+    padding: 2rem;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+  }
+  
+  .admin-home h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  .stats-container {
+    display: flex;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .stat-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s ease;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+    height: 50px;
+    width: auto;
+  }
+  
+  .stat-info h3 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+    color: #444;
+  }
+  
+  .stat-info p {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0.25rem 0 0;
+    color: #222;
+  }
+  

@@ -1,15 +1,53 @@
 
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import star_icon from '../assets/star_icon.png';
 import star_dull_icon from '../assets/star_dull_icon.png';
 import { ShopContext } from '../Context/ShopContext';
+import location from '../assets/location.png';
+import sizechart from '../assets/sizechart.jpg';
+import sizechart_logo from '../assets/sizechart_logo.png';
 
 const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
 const ProductDisplay = (props) => {
   const { addToCart, addSizeToMap, addQuantityToMap } = useContext(ShopContext);
   const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedQuantity, setSelectedQuantity] = useState(1); // default 1
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [showSizeChart, setShowSizeChart] = useState(false);
+  const userId = localStorage.getItem('userId');
+
+  const [user, setUser] = useState({
+    name: '',
+    email: '',
+    date: '',
+    address: ''
+  });
+
+  const handleSizeChart = () => {
+    setShowSizeChart(true);
+  }
+
+  const handleCloseSizeChart = () => {
+    setShowSizeChart(false);
+  }
+
+  useEffect(() => {
+
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/api/user/${userId}`);
+        const data = await response.json();
+        setUser(data);
+
+      } catch (err) {
+        console.error(err, 'not data received');
+      }
+    }
+
+    fetchUser();
+
+  }, [userId]);
+
 
   return (
     <>
@@ -27,7 +65,7 @@ const ProductDisplay = (props) => {
         </div>
 
         {/* Main Image */}
-        <div className="flex-1 flex justify-center items-center">
+        <div className=" flex-1 flex justify-center items-center pb-50">
           <img
             className="w-full max-w-md object-cover rounded shadow-lg"
             src={props.productImage}
@@ -66,7 +104,7 @@ const ProductDisplay = (props) => {
           </div>
 
           {/* Sizes */}
-          <div>
+          <div className='' >
             <p className="font-semibold mb-1">Select your size:</p>
             <div className="flex gap-2 flex-wrap">
               {sizes.map((size) => (
@@ -80,6 +118,34 @@ const ProductDisplay = (props) => {
                 </button>
               ))}
             </div>
+            <div className="mt-4 flex">
+              <button
+                onClick={handleSizeChart}
+                className="bg-blue-100 text-black hover:bg-blue-100 cursor-pointer transition"
+              >
+                Size guide
+              </button>
+              <img src={sizechart_logo} alt="" className='w-8 h-auto ml-2' />
+            </div>
+
+            {/* Fullscreen Size Chart Modal */}
+            {showSizeChart && (
+              <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
+                <div className="relative bg-white rounded-lg shadow-lg p-4 max-w-screen-lg w-full">
+                  <button
+                    onClick={handleCloseSizeChart}
+                    className="absolute top-2 right-2 text-black bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
+                  >
+                    Close
+                  </button>
+                  <img
+                    src={sizechart}
+                    alt="Size Chart"
+                    className="w-full h-auto object-contain rounded"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Quantity */}
@@ -95,6 +161,19 @@ const ProductDisplay = (props) => {
               </option>
             ))}
           </select>
+
+            {/* Deliver to */}
+          <div className="flex items-center gap-3 p-4 bg-white rounded shadow mb-4">
+            <img src={location} alt="location icon" className="h-5 w-5" />
+            <h3 className="text-lg font-semibold text-gray-800">Deliver to:</h3>
+            {user.address ? (
+              <p className="text-gray-700 ml-2 truncate text-xl">{user.address}</p>
+            ) : (
+              <p className="text-red-500 ml-2 text-xl">Login to see availability</p>
+            )}
+          </div>
+
+
 
 
           {/* Add to Cart */}

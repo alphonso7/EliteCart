@@ -14,13 +14,13 @@
     grid-template-columns: 1fr 3fr 1fr 1fr 1fr 1fr;
     gap:10px;
     width: 100%;
-    padding: 20px 0px;
+    padding: 10px 0px;
     color: #454545;
-    font-size: 15px;
+    font-size: 19px;
     font-weight: 600;
 }
 .format{
-    /* align-items: center; */
+    align-items: center;
     font-weight: 500;
 }
 .product-icon{
@@ -51,3 +51,31 @@
         height: 60px;
     }
 }
+
+
+
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    align-items: center;
+  }
+  
+  .filter-bar input,
+  .filter-bar select {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    min-width: 180px;
+  }
+  
+  .filter-bar input:focus,
+  .filter-bar select:focus {
+    outline: none;
+    border-color: #888;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  }
+  

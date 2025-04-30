@@ -10,7 +10,7 @@ const OrderSchema = new mongoose.Schema({
         }
     ],
     totalAmount: { type: Number, required: true },
-    status: { type: String, default: "Processing" }, // Other statuses: "Shipped", "Delivered", "Cancelled"
+    status: { type: String, default: "Processing" }, 
     createdAt: { type: Date, default: Date.now }
 });
 

@@ -7,6 +7,8 @@
     max-width: 250px;
     height: 100vh;
     background: white;
+    position: sticky;
+    top: 70px;
 }
 .sidebar-item{
     display: flex;

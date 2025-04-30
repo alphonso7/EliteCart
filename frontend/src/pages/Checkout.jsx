@@ -10,7 +10,7 @@ const Checkout = () => {
   // const [userDetails, setUserDetails] = useState(null);
   const navigate = useNavigate();
   const [showAddress, setShowAddress] = useState(true);
-  const userId = localStorage.getItem('userId'); // must be set after login/registration
+  const userId = localStorage.getItem('userId'); 
   console.log(userId)
   const [user, setUser] = useState({
     name: '',
@@ -18,7 +18,7 @@ const Checkout = () => {
     date: '',
     address: ''
   });
-  // const [cartItems, setCartItems] = useState([]); // replace with real cart context or props
+
 
   const placeOrder = async() => {
     const authToken = localStorage.getItem("auth-token");

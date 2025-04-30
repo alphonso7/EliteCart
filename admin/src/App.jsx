@@ -1,6 +1,7 @@
 import Admin from './pages/Admin'
 import Navbar from './components/Navbar'
 import AdminOrders from './components/AdminOrders'
+import Footer from '../../frontend/src/components/Footer'
 
 function App() {
 
@@ -8,7 +9,6 @@ function App() {
     <>
       <Navbar/>
       <Admin/>
-      
 
     </>
   )
