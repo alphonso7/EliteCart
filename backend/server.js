@@ -9,7 +9,7 @@ const Product = require("./models/Product");
 const Users = require("./models/Users");
 const Order = require("./models/Order");
 const Jimp = require("jimp");
-const { kmeans } = require("ml-kmeans");   // ✅ Fix Import
+const { kmeans } = require("ml-kmeans"); 
 const chroma = require("chroma-js");
 const Vibrant = require("node-vibrant/browser");
 
@@ -18,14 +18,12 @@ require("dotenv").config();
 
 const app = express();
 app.use(express.json());
-// app.use(cors());
 app.use(express.urlencoded({ extended: true })); // ✅ Ensures form data is parsed correctly
 
 const authMiddleware = require("./middleware/authMiddleware");
-// const adminMiddleware = require('./middleware/adminMiddleware');
 
 
-const allowedOrigins = ["http://localhost:5000", "http://localhost:4000"];
+// const allowedOrigins = ["http://localhost:5000", "http://localhost:4000"];
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -85,7 +83,7 @@ app.use("/images", express.static(path.join(__dirname, "/upload/images")));
 app.post("/upload", upload.single("product"), (req, res) => {
   res.json({
     success: 1,
-    image_url: `http://localhost:${process.env.PORT}/images/${req.file.filename}`,
+    image_url: `${process.env.BASE_URL}/images/${req.file.filename}`,
   });
 });
 
@@ -416,17 +414,6 @@ app.get("/api/checkout", async (req, res) =>{
   }
 })
 
-
-
-// async function extractColorFromImage(imageUrl) {
-//     try {
-//         const palette = await Vibrant.from(imageUrl).getPalette();
-//         return palette.Vibrant.getHex(); // Extract dominant color
-//     } catch (error) {
-//         console.error("❌ Error extracting color:", error);
-//         return "#A0A0A0"; // Default color
-//     }
-// }
 
 app.post("/api/add-product", async (req, res) => {
     const { name, image, category, new_price, old_price, available } = req.body;
