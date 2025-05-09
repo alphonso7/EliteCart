@@ -34,3 +34,11 @@
         margin: 0;
     }
 }
+.dashboard-image{
+    width: 37px;
+    height: auto;
+    gap: 20px;
+}
+.line{
+    width: 200px;
+}

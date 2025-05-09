@@ -43,7 +43,8 @@ const Checkout = () => {
           console.log("Checkout Response:", data); // ✅ Debugging log
 
           if (data.success) {
-              navigate("/yourorders");
+              // navigate("/yourorders");
+              navigate("/thankyou");
               // navigate("/checkout");
           } else {
               alert("Failed to place order: " + (data.message || "Unknown error"));

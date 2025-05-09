@@ -35,13 +35,13 @@ const AdminHome = () => {
 
             if (Array.isArray(data)) {
                 setOrders(data);
-                setUndelivered(data.filter(order => order.status !== 'delivered'));
-                setDelivered(data.filter(order => order.status == 'delivered'));
+                setUndelivered(data.filter(order => order.status !== 'Delivered'));
+                setDelivered(data.filter(order => order.status == 'Delivered'));
             } else {
                 console.error("🚨 Unexpected response format:", data);
                 setOrders([]);
-                setUndelivered(data.filter(order => order.status !== 'delivered'));
-                setDelivered(data.filter(order => order.status == 'delivered'));
+                setUndelivered(data.filter(order => order.status !== 'Delivered'));
+                setDelivered(data.filter(order => order.status == 'Delivered'));
             }
         } catch (error) {
             console.error("Error fetching orders:", error);
