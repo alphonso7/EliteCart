@@ -53,7 +53,7 @@ const ShopContextProvider = (props) =>{
       
 
     useEffect(() => {
-        fetch(`4{API_BASE}/allproducts`)
+        fetch(`${API_BASE}/allproducts`)
             .then((resp) => resp.json())
             .then((data) => {
                 setAllProduct(data);

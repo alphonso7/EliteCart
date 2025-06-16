@@ -25,7 +25,7 @@ const authMiddleware = require("./middleware/authMiddleware");
 // const adminMiddleware = require('./middleware/adminMiddleware');
 
 
-const allowedOrigins = ["http://localhost:5000", "http://localhost:4000"];
+const allowedOrigins = ["http://localhost:5000", "http://localhost:4000", "https://elitecart-frontend.onrender.com"];
 
 app.use(cors({
     origin: function (origin, callback) {
