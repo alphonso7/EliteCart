@@ -25,29 +25,27 @@ const authMiddleware = require("./middleware/authMiddleware");
 // const adminMiddleware = require('./middleware/adminMiddleware');
 
 
-const allowedOrigins = ["http://localhost:5000", "http://localhost:4000", "https://elitecart-frontend.onrender.com"];
+// const allowedOrigins = ["http://localhost:5000", "http://localhost:4000", "https://elitecart-frontend.onrender.com"];
+
+const allowedOrigins = [
+  "http://localhost:5000",
+  "http://localhost:4000",
+  "https://elitecart-frontend.onrender.com"
+];
 
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, origin);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true // ✅ REQUIRED for cookies to work
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: "GET,POST,PUT,DELETE,OPTIONS",
+  allowedHeaders: ["Content-Type", "auth-token"]
 }));
 
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.header("Access-Control-Allow-Origin", origin);
-        res.header("Access-Control-Allow-Credentials", "true"); // ✅ REQUIRED
-        res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        res.header("Access-Control-Allow-Headers", "Content-Type, auth-token");
-    }
-    next();
-});
 
 // Database connection
 mongoose
