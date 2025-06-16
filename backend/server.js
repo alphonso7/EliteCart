@@ -27,24 +27,15 @@ const authMiddleware = require("./middleware/authMiddleware");
 
 // const allowedOrigins = ["http://localhost:5000", "http://localhost:4000", "https://elitecart-frontend.onrender.com"];
 
-const allowedOrigins = [
-  "http://localhost:5000",
-  "http://localhost:4000",
-  "https://elitecart-frontend.onrender.com"
-];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: "https://elitecart-frontend.onrender.com",
   credentials: true,
   methods: "GET,POST,PUT,DELETE,OPTIONS",
   allowedHeaders: ["Content-Type", "auth-token"]
 }));
+
+app.options("*", cors()); // handle preflight
 
 
 // Database connection
