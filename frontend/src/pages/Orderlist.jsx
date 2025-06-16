@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import Categories from "../components/Categories";
 import arrow_icon from '../assets/breadcrum_arrow.png'
 import Footer from "../components/Footer";
+import API_BASE from "../config";
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
@@ -21,7 +22,7 @@ const OrderList = () => {
 
         const fetchOrders = async () => {
             try {
-                const response = await fetch("http://localhost:3000/yourorders", {
+                const response = await fetch(`${API_BASE}/yourorders`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",

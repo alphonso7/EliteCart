@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import circle_check_logo from '../assets/circle_check_logo.png';
 import safe_payment from '../assets/safe_payment.jpg';
+import API_BASE from '../config';
 
 const Checkout = () => {
   const { getTotalCartAmount, all_products, cartItems, sizeMap } = useContext(ShopContext);
@@ -30,7 +31,7 @@ const Checkout = () => {
       Object.entries(filteredCartItems)// Convert keys to numbers
   );
     try {
-          const response = await fetch("http://localhost:3000/create-order", {
+          const response = await fetch(`${API_BASE}/create-order`, {
               method: "POST",
               headers: {
                   "Content-Type": "application/json",
@@ -89,7 +90,7 @@ const Checkout = () => {
 
     const fetchUser = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/user/${userId}`);
+        const response = await fetch(`${API_BASE}/api/user/${userId}`);
         const data = await response.json();
         setUser(data);
 

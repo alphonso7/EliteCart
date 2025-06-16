@@ -4,6 +4,7 @@ import loginimage from '../assets/flipkart_login.jpg';
 import Navbar from '../components/Navbar';
 import Categories from '../components/Categories';
 import Footer from '../components/Footer';
+import API_BASE from '../config';
 
 const LoginSignup = () => {
 
@@ -22,7 +23,7 @@ const LoginSignup = () => {
   const login = async () => {
     console.log("Login executed", formData);
     let responseData;
-    await fetch('http://localhost:3000/login', {
+    await fetch(`${API_BASE}/login`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -44,7 +45,7 @@ const LoginSignup = () => {
   const signup = async () => {
     console.log("Sign up executed", formData)
     let responseData;
-    await fetch('http://localhost:3000/signup', {
+    await fetch(`${API_BASE}/signup`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

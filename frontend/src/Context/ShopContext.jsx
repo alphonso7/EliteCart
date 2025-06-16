@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 // import all_products from '../assets/all_product'
 import Product from "../pages/Product";
+import API_BASE from "../config";
 
 export const ShopContext = createContext(null)
 
@@ -52,7 +53,7 @@ const ShopContextProvider = (props) =>{
       
 
     useEffect(() => {
-        fetch('http://localhost:3000/allproducts')
+        fetch(`4{API_BASE}/allproducts`)
             .then((resp) => resp.json())
             .then((data) => {
                 setAllProduct(data);
@@ -102,7 +103,7 @@ const ShopContextProvider = (props) =>{
         // });
         console.log(cartItems);
         if(localStorage.getItem('auth-token')){
-            fetch('http://localhost:3000/addToCart', {
+            fetch(`${API_BASE}/addToCart`, {
                 method: 'POST',
                 headers:{
                     Accept: 'application/json',
