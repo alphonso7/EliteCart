@@ -3,7 +3,6 @@ import React, { useState, useContext, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShopContext } from '../Context/ShopContext';
 import search_icon from '../assets/search_icon.png';
-// import Categories from '../components/Categories';
 import { useNavigate } from 'react-router-dom';
 import user_icon from '../assets/user_icon.png';
 import order_icon from '../assets/order_icon.png';
@@ -15,7 +14,7 @@ import coupon_logo from '../assets/coupon_logo.png';
 
 const Navbar = () => {
   const { searchQuery, setSearchQuery, getTotalCartItems } = useContext(ShopContext);
-  const [menu, setMenu] = useState("Shop");
+  // const [menu, setMenu] = useState("Shop");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef();

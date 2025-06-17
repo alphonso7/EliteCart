@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Item from "../components/Item";
 import chroma from "chroma-js";
+import API_BASE from "../config";
 
 
 const moodColors = {
@@ -18,15 +19,13 @@ const RelatedProducts = ({ selectedProduct }) => {
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [allProducts, setAllProducts] = useState([]);
     const [mood, setMood] = useState(null);
-    const [showMoodOptions, setShowMoodOptions] = useState(false);
-    const [showViewSimilarButton, setShowViewSimilarButton] = useState(false);
     const [avgColorDistance, setAvgColorDistance] = useState(null);
 
 
     useEffect(() => {
         const fetchAllProducts = async () => {
             try {
-                const response = await axios.get("http://localhost:3000/allproducts");
+                const response = await axios.get(1`${API_BASE}/allproducts`);
                 setAllProducts(response.data);
             } catch (error) {
                 console.error("❌ Error fetching all products:", error);
@@ -39,7 +38,7 @@ const RelatedProducts = ({ selectedProduct }) => {
         if (!selectedProduct || !selectedProduct.id) return;
         if (!mood) {
             const productId = selectedProduct.id;
-            const apiUrl = `http://localhost:3000/api/recommendations?productId=${productId}`;
+            const apiUrl = `${API_BASE}/api/recommendations?productId=${productId}`;
             const fetchRelatedProducts = async () => {
                 try {
                     const response = await axios.get(apiUrl);

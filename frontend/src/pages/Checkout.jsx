@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import circle_check_logo from '../assets/circle_check_logo.png';
 import safe_payment from '../assets/safe_payment.jpg';
+import API_BASE from '../config';
 
 const Checkout = () => {
   const { getTotalCartAmount, all_products, cartItems, sizeMap } = useContext(ShopContext);
@@ -30,7 +31,7 @@ const Checkout = () => {
       Object.entries(filteredCartItems)// Convert keys to numbers
   );
     try {
-          const response = await fetch("http://localhost:3000/create-order", {
+          const response = await fetch(`${API_BASE}/create-order`, {
               method: "POST",
               headers: {
                   "Content-Type": "application/json",
@@ -40,7 +41,7 @@ const Checkout = () => {
           });
 
           const data = await response.json();
-          console.log("Checkout Response:", data); // ✅ Debugging log
+          // console.log("Checkout Response:", data);  
 
           if (data.success) {
               // navigate("/yourorders");
@@ -50,7 +51,7 @@ const Checkout = () => {
               alert("Failed to place order: " + (data.message || "Unknown error"));
           }
       } catch (error) {
-          console.error("Checkout error:", error); // ✅ Log full error
+          console.error("Checkout error:", error);  
           alert("An error occurred while placing the order. Check the console for details.");
       }
   }
@@ -74,8 +75,6 @@ const Checkout = () => {
 
     // Fetch cart items from localStorage or global state
     const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    console.log(savedCart);
-    console.log(cartItems);
     // setCartItems(savedCart);
   }, []);
 
@@ -89,7 +88,7 @@ const Checkout = () => {
 
     const fetchUser = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/user/${userId}`);
+        const response = await fetch(`${API_BASE}/api/user/${userId}`);
         const data = await response.json();
         setUser(data);
 
@@ -101,7 +100,7 @@ const Checkout = () => {
     fetchUser();
 
   }, [userId]);
-  console.log(user);
+  // console.log(user);
 
   // const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   return (

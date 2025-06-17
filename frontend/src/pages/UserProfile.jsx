@@ -6,6 +6,7 @@ import Categories from '../components/Categories';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import user_icon from  '../assets/user_icon.png'
+import API_BASE from '../config';
 
 const UserProfile = () => {
 
@@ -21,7 +22,7 @@ const UserProfile = () => {
     });
 
     useEffect(() => {
-        axios.get(`http://localhost:3000/api/user/${userId}`)
+        axios.get(`${API_BASE}/api/user/${userId}`)
             .then(res => setUser(res.data))
             .catch(err => console.error('Error fetching user:', err));
     }, [userId]);
@@ -32,7 +33,7 @@ const UserProfile = () => {
     };
 
     const handleSave = () => {
-        axios.put(`http://localhost:3000/api/user/${userId}`, user)
+        axios.put(`${API_BASE}/api/user/${userId}`, user)
             .then(() => alert('Profile updated successfully!'))
             .then(() => { setIsEditing(false) })
             .catch(err => alert('Error updating profile.'));

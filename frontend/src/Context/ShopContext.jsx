@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
-// import all_products from '../assets/all_product'
 import Product from "../pages/Product";
+import API_BASE from "../config";
 
 export const ShopContext = createContext(null)
 
@@ -52,7 +52,7 @@ const ShopContextProvider = (props) =>{
       
 
     useEffect(() => {
-        fetch('http://localhost:3000/allproducts')
+        fetch(`${API_BASE}/allproducts`)
             .then((resp) => resp.json())
             .then((data) => {
                 setAllProduct(data);
@@ -80,29 +80,18 @@ const ShopContextProvider = (props) =>{
       
 
     const addToCart = (itemId, selectedSize, selectedQuantity = 1) =>{
-        console.log(itemId);
-        console.log(selectedSize);
-        console.log(typeof(itemId));
+        // console.log(itemId);
+        // console.log(selectedSize);
+        // console.log(typeof(itemId));
         // setcartItems((prev) => ({...prev, [itemId]:(prev[itemId] || 0)+1}));
         setcartItems((prev) => ({
             ...prev,
             [itemId]: (prev[itemId] || 0) + (selectedQuantity || 1),
           }));
           
-        // setcartItems((prev) => {
-        //     const existingItem = prev[itemId] || { quantity: 0, size: selectedSize };
-        //     console.log(existingItem);
-        //     return {
-        //         ...prev,
-        //         [itemId]: {
-        //             quantity: existingItem.quantity + 1,
-        //             size: selectedSize || existingItem.size,
-        //         },
-        //     };
-        // });
         console.log(cartItems);
         if(localStorage.getItem('auth-token')){
-            fetch('http://localhost:3000/addToCart', {
+            fetch(`${API_BASE}/addToCart`, {
                 method: 'POST',
                 headers:{
                     Accept: 'application/json',
@@ -121,7 +110,7 @@ const ShopContextProvider = (props) =>{
     const getTotalCartAmount = () => {
         let totalAmount = 0;
         
-        console.log("🔍 Available Product IDs:", all_products.map(p => p.id));
+        // console.log("🔍 Available Product IDs:", all_products.map(p => p.id));
 
     
         // console.log(cartItems)
@@ -131,7 +120,7 @@ const ShopContextProvider = (props) =>{
                 // console.log(productInfo)
     
                 if (!productInfo) {  
-                    console.warn(`⚠️ Product with ID ${item} not found in all_products.`);
+                    console.warn(`Product with ID ${item} not found in all_products.`);
                     continue;
                 }
     

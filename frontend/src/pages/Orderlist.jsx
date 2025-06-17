@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import Categories from "../components/Categories";
 import arrow_icon from '../assets/breadcrum_arrow.png'
 import Footer from "../components/Footer";
+import API_BASE from "../config";
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
@@ -21,23 +22,22 @@ const OrderList = () => {
 
         const fetchOrders = async () => {
             try {
-                const response = await fetch("http://localhost:3000/yourorders", {
+                const response = await fetch(`${API_BASE}/yourorders`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        "auth-token": authToken, // ✅ Send auth token for user-specific orders
+                        "auth-token": authToken, 
                     },
                 });
                 const data = await response.json();
                 // setOrders(data);
 
-                console.log("📦 Fetched Orders:", data); // ✅ Debugging log
 
                 if (Array.isArray(data)) {
-                    setOrders(data); // ✅ Ensure `orders` is always an array
+                    setOrders(data); 
                 } else {
-                    console.error("🚨 Unexpected data format:", data);
-                    setOrders([]); // ✅ Fallback to empty array
+                    console.error(" Unexpected data format:", data);
+                    setOrders([]);  
                 }
             } catch (error) {
                 console.error("Error fetching orders:", error);
@@ -45,7 +45,7 @@ const OrderList = () => {
         };
 
         fetchOrders();
-    }, [navigate]); // ✅ Redirect immediately if not logged in
+    }, [navigate]);  
 
     const statuses = ['All', 'Delivered', 'Cancelled', 'Shipped', 'Processing'];
     const filteredOrders = filteredStatus === 'All'

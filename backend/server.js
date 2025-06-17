@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
@@ -9,43 +8,29 @@ const Product = require("./models/Product");
 const Users = require("./models/Users");
 const Order = require("./models/Order");
 const Jimp = require("jimp");
-const { kmeans } = require("ml-kmeans"); 
+const { kmeans } = require("ml-kmeans");
 const chroma = require("chroma-js");
 const Vibrant = require("node-vibrant/browser");
-
 
 require("dotenv").config();
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // ✅ Ensures form data is parsed correctly
+app.use(express.urlencoded({ extended: true }));
 
 const authMiddleware = require("./middleware/authMiddleware");
 
+app.use(
+  cors({
+    origin: "https://elitecart-frontend.onrender.com",
+    credentials: true,
+    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    allowedHeaders: ["Content-Type", "auth-token"],
+  })
+);
 
-// const allowedOrigins = ["http://localhost:5000", "http://localhost:4000"];
-
-// app.use(cors({
-//     origin: function (origin, callback) {
-//         if (!origin || allowedOrigins.includes(origin)) {
-//             callback(null, origin);
-//         } else {
-//             callback(new Error("Not allowed by CORS"));
-//         }
-//     },
-//     credentials: true // ✅ REQUIRED for cookies to work
-// }));
-
-// app.use((req, res, next) => {
-//     const origin = req.headers.origin;
-//     if (allowedOrigins.includes(origin)) {
-//         res.header("Access-Control-Allow-Origin", origin);
-//         res.header("Access-Control-Allow-Credentials", "true"); // ✅ REQUIRED
-//         res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-//         res.header("Access-Control-Allow-Headers", "Content-Type, auth-token");
-//     }
-//     next();
-// });
+// Handle preflight OPTIONS requests
+app.options("*", cors());
 
 // Database connection
 mongoose
@@ -104,9 +89,7 @@ app.post("/addproduct", async (req, res) => {
     new_price: req.body.new_price,
     old_price: req.body.old_price,
   });
-  console.log(product);
   await product.save();
-  console.log("saved");
   res.json({
     success: true,
     name: req.body.name,
@@ -128,7 +111,7 @@ app.post("/removeproduct", async (req, res) => {
     res.json({
       success: true,
       message: "Product removed successfully",
-      deletedProduct: deletedProduct, // Send deleted product details
+      deletedProduct: deletedProduct,
     });
   } catch (error) {
     console.error("Error removing product:", error);
@@ -144,7 +127,6 @@ app.post("/removeproduct", async (req, res) => {
 app.get("/allproducts", async (req, res) => {
   try {
     let products = await Product.find({});
-    // console.log("All Products fetch");
     res.send(products);
   } catch {
     console.error("Error fetching products:", error);
@@ -178,13 +160,12 @@ app.post("/signup", async (req, res) => {
   const data = {
     user: {
       id: user.id,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
     },
   };
   const token = jwt.sign(data, "secret_ecom");
   res.json({ success: true, token });
-  
-   
+
   res.json({ success: true, isAdmin: user.isAdmin });
 });
 //creating endpoint for user login
@@ -200,11 +181,11 @@ app.post("/login", async (req, res) => {
       const data = {
         user: {
           id: user.id,
-          isAdmin: user.isAdmin
+          isAdmin: user.isAdmin,
         },
       };
       const token = jwt.sign(data, "secret_ecom");
-       
+
       res.json({ success: true, token, userId: user.id });
     } else {
       res.json({ success: false, errors: "Wrong password" });
@@ -227,7 +208,9 @@ app.put("/user/profile", authMiddleware, async (req, res) => {
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     res.json({ success: true, user: updatedUser });
@@ -237,27 +220,29 @@ app.put("/user/profile", authMiddleware, async (req, res) => {
   }
 });
 
-app.get('/api/user/:id', async (req, res) => {
+app.get("/api/user/:id", async (req, res) => {
   try {
-    const user = await Users.findById(req.params.id).select('name email date address');
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    const user = await Users.findById(req.params.id).select(
+      "name email date address"
+    );
+    if (!user) return res.status(404).json({ error: "User not found" });
     res.json(user);
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: "Server error" });
   }
 });
-app.put('/api/user/:id', async (req, res) => {
+app.put("/api/user/:id", async (req, res) => {
   const { name, email, date, address } = req.body;
   try {
     const user = await Users.findByIdAndUpdate(
       req.params.id,
       { name, email, date, address },
       { new: true, runValidators: true }
-    ).select('name email date address');
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    ).select("name email date address");
+    if (!user) return res.status(404).json({ error: "User not found" });
     res.json(user);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to update user' });
+    res.status(500).json({ error: "Failed to update user" });
   }
 });
 
@@ -265,7 +250,6 @@ app.put('/api/user/:id', async (req, res) => {
 app.get("/newCollections", async (req, res) => {
   let products = await Product.find({});
   let newCollection = products.slice(1).slice(-8);
-  console.log("New Collection fecthed");
   res.send(newCollection);
 });
 
@@ -273,7 +257,6 @@ app.get("/newCollections", async (req, res) => {
 app.get("/popularInWomen", async (req, res) => {
   let products = await Product.find({ category: "women" });
   let popular_in_women = products.slice(0, 4);
-  console.log("POpulalr in women fecthed");
   res.send(popular_in_women);
 });
 
@@ -286,14 +269,11 @@ app.post("/addToCart", async (req, res) => {
 app.get("/yourorders", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log("👤 Fetching orders for User ID:", userId);
 
     const orders = await Order.find({ userId }).populate(
       "items.productId",
       "name image new_price"
     );
-
-    console.log("📦 Orders Fetched from DB:", orders);
 
     if (!orders || !Array.isArray(orders)) {
       console.error("🚨 No valid orders found");
@@ -313,27 +293,33 @@ app.post("/create-order", authMiddleware, async (req, res) => {
     const userId = req.user.id;
     const cartItems = req.body;
 
-    console.log("User ID:", userId);
 
-const numericProductIds = Object.keys(cartItems).map(id => parseInt(id, 10)); // Convert to numbers
+    const numericProductIds = Object.keys(cartItems).map((id) =>
+      parseInt(id, 10)
+    ); // Convert to numbers
 
-// Fetch the correct MongoDB _id using the numeric id
-const products = await Product.find({ id: { $in: numericProductIds } }, "_id id new_price");
+    // Fetch the correct MongoDB _id using the numeric id
+    const products = await Product.find(
+      { id: { $in: numericProductIds } },
+      "_id id new_price"
+    );
 
-const productIdMap = new Map(products.map(product => [product.id, product._id.toString()])); // Map id to _id
+    const productIdMap = new Map(
+      products.map((product) => [product.id, product._id.toString()])
+    ); // Map id to _id
 
-const orderItems = numericProductIds.map(id => ({
-    productId: productIdMap.get(id), // Get _id from map
-    quantity: cartItems[id],
-}));
+    const orderItems = numericProductIds.map((id) => ({
+      productId: productIdMap.get(id), // Get _id from map
+      quantity: cartItems[id],
+    }));
 
-// Calculate total price correctly
-const totalAmount = orderItems.reduce((total, item) => {
-    const price = products.find(p => p._id.toString() === item.productId)?.new_price || 0;
-    return total + (price * item.quantity);
-}, 0);
-
-
+    // Calculate total price correctly
+    const totalAmount = orderItems.reduce((total, item) => {
+      const price =
+        products.find((p) => p._id.toString() === item.productId)?.new_price ||
+        0;
+      return total + price * item.quantity;
+    }, 0);
 
     const newOrder = new Order({
       userId,
@@ -343,7 +329,7 @@ const totalAmount = orderItems.reduce((total, item) => {
     });
 
     await newOrder.save();
-    console.log("Order saved successfully:", newOrder);
+    // console.log("Order saved successfully:", newOrder);
     res.json({ success: true, order: newOrder });
   } catch (error) {
     console.error("Error creating order:", error);
@@ -355,187 +341,197 @@ const totalAmount = orderItems.reduce((total, item) => {
 
 app.get("/admin/orders", async (req, res) => {
   try {
-      const orders = await Order.find().populate("items.productId", 'name');  
+    const orders = await Order.find().populate("items.productId", "name");
 
-      if (!Array.isArray(orders)) {
-          return res.status(500).json({ message: "Orders should be an array" });
-      }
+    if (!Array.isArray(orders)) {
+      return res.status(500).json({ message: "Orders should be an array" });
+    }
 
-      res.json(orders);
+    res.json(orders);
   } catch (error) {
-      console.error("Error fetching orders:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
-
-
 app.put("/admin/orders/:orderId", async (req, res) => {
   try {
-      const { status } = req.body;
-      const orderId = req.params.orderId;
+    const { status } = req.body;
+    const orderId = req.params.orderId;
 
-      const updatedOrder = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
-      if (!updatedOrder) {
-          return res.status(404).json({ message: "Order not found" });
-      }
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    );
+    if (!updatedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
 
-      res.json({ success: true, message: "Order status updated", order: updatedOrder });
+    res.json({
+      success: true,
+      message: "Order status updated",
+      order: updatedOrder,
+    });
   } catch (error) {
-      console.error("Error updating order status:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+    console.error("Error updating order status:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
 //api to see total users
-app.get('/totalusers', async (req, res) => {
+app.get("/totalusers", async (req, res) => {
   try {
-    const count = await Users.countDocuments();  // counts all users
+    const count = await Users.countDocuments(); // counts all users
     res.json({ count });
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching user count' });
+    res.status(500).json({ message: "Error fetching user count" });
   }
 });
 
-  
 // api for checkout page
-app.get("/api/checkout", async (req, res) =>{
-  try{
-    const user = await Users.findById(req.user.id).select('name email address');
-    if(!user) return res.status(404).json({error: 'User not found'});
+app.get("/api/checkout", async (req, res) => {
+  try {
+    const user = await Users.findById(req.user.id).select("name email address");
+    if (!user) return res.status(404).json({ error: "User not found" });
     res.json({
       name: user.name,
       email: user.email,
       address: user.address,
     });
-  } catch(error) {
+  } catch (error) {
     console.error("Error creating order");
-    res.status(500).json({error: 'server error'});
+    res.status(500).json({ error: "server error" });
   }
-})
-
-
-app.post("/api/add-product", async (req, res) => {
-    const { name, image, category, new_price, old_price, available } = req.body;
-    
-    const dominantColor = await extractColorFromImage(image);
-
-    const newProduct = new Product({
-        name,
-        image,
-        category,
-        new_price,
-        old_price,
-        available,
-        color: dominantColor // ✅ Store extracted color
-    });
-
-    await newProduct.save();
-    res.json({ success: true, product: newProduct });
 });
 
+app.post("/api/add-product", async (req, res) => {
+  const { name, image, category, new_price, old_price, available } = req.body;
 
+  const dominantColor = await extractColorFromImage(image);
 
+  const newProduct = new Product({
+    name,
+    image,
+    category,
+    new_price,
+    old_price,
+    available,
+    color: dominantColor, // ✅ Store extracted color
+  });
+
+  await newProduct.save();
+  res.json({ success: true, product: newProduct });
+});
 
 app.get("/api/products", async (req, res) => {
   try {
-      let products = await Product.find({});
-      let productsWithColors = await Promise.all(products.map(getProductWithColors));
-      res.json(productsWithColors);
+    let products = await Product.find({});
+    let productsWithColors = await Promise.all(
+      products.map(getProductWithColors)
+    );
+    res.json(productsWithColors);
   } catch (error) {
-      console.error("Error fetching products:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 const extractCenterColor = async (imageUrl) => {
   try {
-      const image = await Jimp.read(imageUrl);
-      const centerX = Math.floor(image.bitmap.width / 2);
-      const centerY = Math.floor(image.bitmap.height / 2);
+    const image = await Jimp.read(imageUrl);
+    const centerX = Math.floor(image.bitmap.width / 2);
+    const centerY = Math.floor(image.bitmap.height / 2);
 
-      // ✅ Extract a larger 20x20 pixel average color from the center
-      let r = 0, g = 0, b = 0, count = 0;
-      for (let x = centerX - 10; x <= centerX + 10; x++) {  // Range from -10 to +10 for a 20x20 area
-          for (let y = centerY - 10; y <= centerY + 10; y++) {  // Range from -10 to +10 for a 20x20 area
-              const color = Jimp.intToRGBA(image.getPixelColor(x, y));
-              r += color.r;
-              g += color.g;
-              b += color.b;
-              count++;
-          }
+    //  Extract a larger 20x20 pixel average color from the center
+    let r = 0,
+      g = 0,
+      b = 0,
+      count = 0;
+    for (let x = centerX - 10; x <= centerX + 10; x++) {
+      // Range from -10 to +10 for a 20x20 area
+      for (let y = centerY - 10; y <= centerY + 10; y++) {
+        // Range from -10 to +10 for a 20x20 area
+        const color = Jimp.intToRGBA(image.getPixelColor(x, y));
+        r += color.r;
+        g += color.g;
+        b += color.b;
+        count++;
       }
+    }
 
-      const avgColor = chroma(r / count, g / count, b / count).rgb(); // Convert to RGB array
-      return avgColor;
+    const avgColor = chroma(r / count, g / count, b / count).rgb(); // Convert to RGB array
+    return avgColor;
   } catch (error) {
-      console.error("❌ Error extracting center color:", error);
-      return [150, 150, 150]; // Default fallback color
+    console.error(" Error extracting center color:", error);
+    return [150, 150, 150];  
   }
 };
 
-
-// ✅ Find Related Products Using K-Means Clustering
+//  Find Related Products Using K-Means Clustering
 app.get("/api/recommendations", async (req, res) => {
   const { productId } = req.query;
 
   if (!productId) {
-      return res.status(400).json({ error: "Product ID is required" });
+    return res.status(400).json({ error: "Product ID is required" });
   }
 
   try {
-      // ✅ Get selected product's image URL
-      const selectedProduct = await Product.findOne({ id: Number(productId) });
-      if (!selectedProduct) {
-          return res.status(404).json({ error: "Product not found" });
-      }
+    //  Get selected product's image URL
+    const selectedProduct = await Product.findOne({ id: Number(productId) });
+    if (!selectedProduct) {
+      return res.status(404).json({ error: "Product not found" });
+    }
 
-      // console.log(`🖼 Extracting color for selected product: ${selectedProduct.image}`);
-      const selectedColor = await extractCenterColor(selectedProduct.image);
+    
+    const selectedColor = await extractCenterColor(selectedProduct.image);
 
-      // ✅ Fetch all products
-      const products = await Product.find({});
-      
-      // ✅ Extract center colors for all products dynamically
-      const colorPromises = products.map(async (product) => ({
-          ...product._doc,
-          centerColor: await extractCenterColor(product.image)
-      }));
-      
-      const productsWithColors = await Promise.all(colorPromises);
-      // console.log("✅ kmeans function:", typeof kmeans);
+    //  Fetch all products
+    const products = await Product.find({});
+
+    // Extract center colors for all products dynamically
+    const colorPromises = products.map(async (product) => ({
+      ...product._doc,
+      centerColor: await extractCenterColor(product.image),
+    }));
+
+    const productsWithColors = await Promise.all(colorPromises);
+
+    const colorVectors = productsWithColors
+      .map((p) => p.centerColor)
+      .filter((c) => c.length === 3);
+    if (colorVectors.length === 0) {
+      return res.status(500).json({ error: "No valid color data found" });
+    }
 
 
-      const colorVectors = productsWithColors.map(p => p.centerColor).filter(c => c.length === 3);
-      if (colorVectors.length === 0) {
-          return res.status(500).json({ error: "No valid color data found" });
-      }
+    //  K-Means Clustering (Fix)
+    let k = Math.min(5, colorVectors.length); 
+    const clusters = kmeans(colorVectors, k);  
+    // console.log("✅ K-Means Clusters Generated:", clusters.centroids);
 
-      console.log("📊 Running K-Means on", colorVectors.length, "color samples...");
+    const selectedCluster =
+      clusters.clusters[
+        productsWithColors.findIndex((p) => p.id === Number(productId))
+      ];
 
-      // ✅ K-Means Clustering (Fix)
-      let k = Math.min(5, colorVectors.length);  // ✅ Ensure `k` is within valid range
-      const clusters = kmeans(colorVectors, k);  // ✅ Fix K-Means Usage
-      console.log("✅ K-Means Clusters Generated:", clusters.centroids);
+    const relatedProducts = productsWithColors
+      .map((product, index) => ({
+        ...product,
+        cluster: clusters.clusters[index],
+      }))
+      .filter(
+        (product) =>
+          product.cluster === selectedCluster &&
+          product.id !== Number(productId)
+      ) // Exclude selected product
+      .slice(0, 6); //  Show top 6 related products
 
-      // ✅ Find the cluster of the selected product
-      const selectedCluster = clusters.clusters[productsWithColors.findIndex(p => p.id === Number(productId))];
-      console.log(`📌 Selected Product Cluster: ${selectedCluster}`);
-
-      // ✅ Get products from the same cluster
-      const relatedProducts = productsWithColors
-          .map((product, index) => ({
-              ...product,
-              cluster: clusters.clusters[index]
-          }))
-          .filter((product) => product.cluster === selectedCluster && product.id !== Number(productId)) // Exclude selected product
-          .slice(0, 6); // ✅ Show top 6 related products
-
-      console.log("✅ Related Products Found:", relatedProducts.length);
-      res.json(relatedProducts);
+    // console.log(" Related Products Found:", relatedProducts.length);
+    res.json(relatedProducts);
   } catch (error) {
-      console.error("❌ Error fetching recommendations:", error);
-      res.status(500).json({ error: "Failed to fetch related products" });
+    console.error("❌ Error fetching recommendations:", error);
+    res.status(500).json({ error: "Failed to fetch related products" });
   }
 });
 
@@ -546,4 +542,3 @@ app.listen(process.env.PORT, (error) => {
     console.log(error);
   }
 });
-

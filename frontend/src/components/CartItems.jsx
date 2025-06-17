@@ -3,7 +3,6 @@ import { ShopContext } from '../Context/ShopContext'
 // import remove_icon from '../assets/cart_cross_icon.png'
 import empty_cart from '../assets/empty_cart.jpg';
 import { useNavigate } from 'react-router-dom'
-import Footer from './Footer';
 import safe_payment from '../assets/safe_payment.jpg'
 
 const CartItems = () => {
@@ -28,48 +27,21 @@ const CartItems = () => {
         }
 
 
-        console.log(cartItems);
+        // console.log(cartItems);
         const filteredCartItems = Object.fromEntries(
             Object.entries(cartItems).filter(([id, quantity]) => quantity > 0)
         );
-
-        // const formattedCartItems = Object.fromEntries(
-        //     Object.entries(filteredCartItems).map(([key, value]) => [Number(key), value]) // Convert keys to numbers
-        // );
 
         const formattedCartItems = Object.fromEntries(
             Object.entries(filteredCartItems)// Convert keys to numbers
         );
 
-        console.log("✅ Sending filtered cart items:", filteredCartItems);
-        console.log(formattedCartItems)
-        console.log("🛒 Final Cart Data Being Sent:", JSON.stringify(formattedCartItems, null, 2));
+        // console.log("✅ Sending filtered cart items:", filteredCartItems);
+        // console.log(formattedCartItems)
+        // console.log("🛒 Final Cart Data Being Sent:", JSON.stringify(formattedCartItems, null, 2));
 
         navigate("/checkout");
 
-        // try {
-        //     const response = await fetch("http://localhost:3000/create-order", {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //             "auth-token": authToken,
-        //         },
-        //         body: JSON.stringify(formattedCartItems),
-        //     });
-
-        //     const data = await response.json();
-        //     console.log("Checkout Response:", data); // ✅ Debugging log
-
-        //     if (data.success) {
-        //         // navigate("/yourorders");
-        //         navigate("/checkout");
-        //     } else {
-        //         alert("Failed to place order: " + (data.message || "Unknown error"));
-        //     }
-        // } catch (error) {
-        //     console.error("Checkout error:", error); // ✅ Log full error
-        //     alert("An error occurred while placing the order. Check the console for details.");
-        // }
     };
 
     const totalAmount = getTotalCartAmount();
@@ -92,16 +64,6 @@ const CartItems = () => {
 
                         {/* Left Section - Address + Cart Items */}
                         <div className="w-full lg:w-3/4 pr-0 lg:pr-6">
-                            {/* Deliver To Section */}
-                            {/* <div className="bg-white p-4 rounded-lg shadow mb-6">
-                                <h2 className="text-lg font-semibold text-gray-800 mb-2">Deliver to:</h2>
-                                <input
-                                    type="text"
-                                    placeholder="Enter your full delivery address"
-                                    className="w-full border border-gray-300 p-2 rounded"
-                                />
-                            </div> */}
-
                             {/* Cart Items */}
                             {all_products.map((e) => {
                                 if (cartItems[e.id] > 0) {

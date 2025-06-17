@@ -6,6 +6,7 @@ import { ShopContext } from '../Context/ShopContext';
 import location from '../assets/location.png';
 import sizechart from '../assets/sizechart.jpg';
 import sizechart_logo from '../assets/sizechart_logo.png';
+import API_BASE from '../config';
 
 const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -35,7 +36,7 @@ const ProductDisplay = (props) => {
 
     const fetchUser = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/user/${userId}`);
+        const response = await fetch(`${API_BASE}/api/user/${userId}`);
         const data = await response.json();
         setUser(data);
 
@@ -185,7 +186,7 @@ const ProductDisplay = (props) => {
                   return;
                 }
 
-                console.log("✅ Selected Size:", selectedSize);
+                console.log(" Selected Size:", selectedSize);
                 addSizeToMap(props.productId, selectedSize);
                 addQuantityToMap(props.productId, selectedQuantity);
                 addToCart(props.productId, selectedSize, selectedQuantity);

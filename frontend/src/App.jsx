@@ -1,10 +1,9 @@
-import Navbar from './components/Navbar'
+
 import Shop from './pages/Shop'
 import ShopCategory from './pages/ShopCategory'
 import Product from './pages/Product'
 import Cart from './pages/Cart'
 import LoginSignup from './pages/LoginSignup'
-import './App.css'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import men_banner from './assets/banner_mens.png'
 import women_banner from './assets/banner_women.png'
