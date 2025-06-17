@@ -89,7 +89,7 @@ const ShopContextProvider = (props) =>{
             [itemId]: (prev[itemId] || 0) + (selectedQuantity || 1),
           }));
           
-        console.log(cartItems);
+        // console.log(cartItems);
         if(localStorage.getItem('auth-token')){
             fetch(`${API_BASE}/addToCart`, {
                 method: 'POST',
