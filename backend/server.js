@@ -68,13 +68,15 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage: storage });
+const BASE_URL = process.env.BASE_URL;
 
 // creating upload endpoint for images
 app.use("/images", express.static(path.join(__dirname, "/upload/images")));
 app.post("/upload", upload.single("product"), (req, res) => {
   res.json({
     success: 1,
-    image_url: `http://localhost:${process.env.PORT}/images/${req.file.filename}`,
+    // image_url: `http://localhost:${process.env.PORT}/images/${req.file.filename}`,
+    image_url: `${BASE_URL}/images/${req.file.filename}`,
   });
 });
 
