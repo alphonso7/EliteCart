@@ -19,10 +19,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const authMiddleware = require("./middleware/authMiddleware");
+const allowedOrigins = ["http://localhost:3000", "http://localhost:5000", "https://elitecart-frontend.onrender.com", "https://elitecart-backend.onrender.com"]
 
 app.use(
   cors({
-    origin: "https://elitecart-frontend.onrender.com",
+    // origin: "https://elitecart-frontend.onrender.com",
+    origin: allowedOrigins,
     credentials: true,
     methods: "GET,POST,PUT,DELETE,OPTIONS",
     allowedHeaders: ["Content-Type", "auth-token"],
@@ -127,8 +129,9 @@ app.post("/removeproduct", async (req, res) => {
 app.get("/allproducts", async (req, res) => {
   try {
     let products = await Product.find({});
-    res.send(products);
-  } catch {
+    // res.send(products);
+    res.json(products);
+  } catch(error) {
     console.error("Error fetching products:", error);
     res.status(500).json({ message: "NOt found" });
   }

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import Product from "../pages/Product";
+// import Product from "../pages/Product";
 import API_BASE from "../config";
 
 export const ShopContext = createContext(null)
@@ -52,6 +52,7 @@ const ShopContextProvider = (props) =>{
       
 
     useEffect(() => {
+        // console.log(API_BASE)
         fetch(`${API_BASE}/allproducts`)
             .then((resp) => resp.json())
             .then((data) => {
