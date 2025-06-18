@@ -137,6 +137,9 @@ app.get("/allproducts", async (req, res) => {
   }
 });
 
+
+//creating endpoint to see product
+
 //Creating endpoint for registering user
 app.post("/signup", async (req, res) => {
   let check = await Users.findOne({ email: req.body.email });
