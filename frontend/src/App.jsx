@@ -4,7 +4,7 @@ import ShopCategory from './pages/ShopCategory'
 import Product from './pages/Product'
 import Cart from './pages/Cart'
 import LoginSignup from './pages/LoginSignup'
-import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import {BrowserRouter, Routes, Route, HashRouter} from 'react-router-dom'
 import men_banner from './assets/banner_mens.png'
 import women_banner from './assets/banner_women.png'
 import kids_banner from './assets/banner_kids.png'
@@ -18,7 +18,7 @@ function App() {
   return (
     <>
       <div className='w-100 sm:w-auto md:w-auto' >
-        <BrowserRouter>
+        <HashRouter>
         {/* <Navbar/> */}
         <Routes>
           <Route path='/' element={<Shop/>} ></Route>
@@ -35,7 +35,7 @@ function App() {
           <Route path='/checkout' element={<Checkout/>} ></Route>
           <Route path='/thankyou' element={<ThankYou/>} ></Route>
         </Routes>
-        </BrowserRouter>
+        </HashRouter>
         
 
          
