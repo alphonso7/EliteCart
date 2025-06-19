@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const authMiddleware = require("./middleware/authMiddleware");
-const allowedOrigins = ["http://localhost:3000", "http://localhost:5000", "https://elitecart-frontend.onrender.com", "https://elitecart-backend.onrender.com"]
+const allowedOrigins = ["http://localhost:3000", "http://localhost:5000", "https://elitecart-frontend.onrender.com", "https://elitecart-backend.onrender.com", "https://elitecart-frontend.netlify.app/"]
 
 app.use(
   cors({
