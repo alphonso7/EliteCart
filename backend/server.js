@@ -65,6 +65,12 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// handles all path to index html if not provided 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+});
+
+
 // creating upload endpoint for images
 app.use("/images", express.static(path.join(__dirname, "/upload/images")));
 app.post("/upload", upload.single("product"), (req, res) => {
