@@ -13,12 +13,12 @@ const UserProfile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const navigate = useNavigate();
     const userId = localStorage.getItem('userId'); // must be set after login/registration
-    console.log(userId)
+    // console.log(userId)
     const [user, setUser] = useState({
         name: '',
         email: '',
         date: '',
-        address: ''
+        address: '',
     });
 
     useEffect(() => {

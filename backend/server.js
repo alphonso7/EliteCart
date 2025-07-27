@@ -6,11 +6,14 @@ const jwt = require("jsonwebtoken");
 const path = require("path");
 const Product = require("./models/Product");
 const Users = require("./models/Users");
+const Admins = require('./models/Admins');
 const Order = require("./models/Order");
 const Jimp = require("jimp");
 const { kmeans } = require("ml-kmeans");
 const chroma = require("chroma-js");
 const Vibrant = require("node-vibrant/browser");
+const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 
 require("dotenv").config();
 
@@ -139,9 +142,72 @@ app.get("/allproducts", async (req, res) => {
 });
 
 
-//creating endpoint to see product
 
+//old code
 //Creating endpoint for registering user
+// app.post("/signup", async (req, res) => {
+//   let check = await Users.findOne({ email: req.body.email });
+//   if (check) {
+//     res.status(400).json({
+//       success: false,
+//       errors: "Existing user found with same email address",
+//     });
+//   }
+//   let cart = {};
+//   for (let i = 0; i < 300; i++) {
+//     cart[i] = 0;
+//   }
+//   // const salt = await bcrypt.genSalt(10);
+//   // const hashedPassword = await bcrypt.hash(req.body.password, salt);
+//   const user = new Users({
+//     name: req.body.username,
+//     email: req.body.email,
+//     password: req.body.password,
+//     cartData: cart,
+//     isAdmin: req.body.isAdmin || false,
+//   });
+//   await user.save();
+//   const data = {
+//     user: {
+//       id: user.id,
+//       isAdmin: user.isAdmin,
+//     },
+//   };
+//   const token = jwt.sign(data, "secret_ecom");
+//   res.json({ success: true, token });
+
+//   res.json({ success: true, isAdmin: user.isAdmin });
+// });
+// //creating endpoint for user login
+// app.post("/login", async (req, res) => {
+//   let user = await Users.findOne({ email: req.body.email });
+//   // console.log(user)
+//   if (user) {
+//     // console.log(req.body.password);
+//     // console.log(user.password)
+//     // const passCompare = await bcrypt.compare(req.body.password, user.password);
+//     const passCompare = req.body.password === user.password;
+//     if (passCompare) {
+//       const data = {
+//         user: {
+//           id: user.id,
+//           isAdmin: user.isAdmin,
+//         },
+//       };
+//       const token = jwt.sign(data, "secret_ecom");
+
+//       res.json({ success: true, token, userId: user.id });
+//     } else {
+//       res.json({ success: false, errors: "Wrong password" });
+//     }
+//   } else {
+//     res.json({ success: false, errors: "Wrong EmailId" });
+//   }
+// });
+
+
+//mew code 
+//creating endpoint for user registration
 app.post("/signup", async (req, res) => {
   let check = await Users.findOne({ email: req.body.email });
   if (check) {
@@ -154,12 +220,12 @@ app.post("/signup", async (req, res) => {
   for (let i = 0; i < 300; i++) {
     cart[i] = 0;
   }
-  // const salt = await bcrypt.genSalt(10);
-  // const hashedPassword = await bcrypt.hash(req.body.password, salt);
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(req.body.password, salt);
   const user = new Users({
     name: req.body.username,
     email: req.body.email,
-    password: req.body.password,
+    password: hashedPassword,
     cartData: cart,
     isAdmin: req.body.isAdmin || false,
   });
@@ -171,10 +237,12 @@ app.post("/signup", async (req, res) => {
     },
   };
   const token = jwt.sign(data, "secret_ecom");
-  res.json({ success: true, token });
+  res.json({ success: true, token, userId: user.id });
 
-  res.json({ success: true, isAdmin: user.isAdmin });
+  // res.json({ success: true, isAdmin: user.isAdmin });
 });
+
+ 
 //creating endpoint for user login
 app.post("/login", async (req, res) => {
   let user = await Users.findOne({ email: req.body.email });
@@ -182,8 +250,8 @@ app.post("/login", async (req, res) => {
   if (user) {
     // console.log(req.body.password);
     // console.log(user.password)
-    // const passCompare = await bcrypt.compare(req.body.password, user.password);
-    const passCompare = req.body.password === user.password;
+    var passCompare =await bcrypt.compare(req.body.password, user.password);
+    // const passCompare = req.body.password === user.password;
     if (passCompare) {
       const data = {
         user: {
@@ -192,6 +260,7 @@ app.post("/login", async (req, res) => {
         },
       };
       const token = jwt.sign(data, "secret_ecom");
+      // localStorage.setItem(user.id);
 
       res.json({ success: true, token, userId: user.id });
     } else {
@@ -201,6 +270,63 @@ app.post("/login", async (req, res) => {
     res.json({ success: false, errors: "Wrong EmailId" });
   }
 });
+
+// admin registration
+app.post("/adminsignup", async (req, res) => {
+  let check = await Admins.findOne({ email: req.body.email });
+  if (check) {
+    res.status(400).json({
+      success: false,
+      errors: "Existing user found with same email address",
+    });
+  }
+  const admin = new Admins({
+    name: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+    accessId: req.body.accessId,
+  });
+  await admin.save();
+  const data = {
+    admin: {
+      id: admin._id,
+      accessId: admin.accessId,
+    },
+  };
+  const token = jwt.sign(data, "secret_admin");
+  res.json({ success: true, token });
+
+  // res.json({ success: true});
+});
+
+//Admin login
+app.post("/adminlogin", async (req, res) => {
+  let admin = await Admins.findOne({ email: req.body.email });
+  if (admin) {
+    // console.log(req.body.password);
+    // console.log(user.password)
+    // const passCompare = await bcrypt.compare(req.body.password, user.password);
+    const passCompare = req.body.password === admin.password;
+    if (passCompare) {
+      const data = {
+        admin: {
+          id: admin._id,
+          accessId: admin.accessId,
+        },
+      };
+      const token = jwt.sign(data, "secret_admin");
+
+      res.json({ success: true, token });
+    } else {
+      res.json({ success: false, errors: "Wrong password" });
+    }
+  } else {
+    res.json({ success: false, errors: "Wrong EmailId" });
+  }
+});
+//new code ends
+
+
 
 // Update user profile
 app.put("/user/profile", authMiddleware, async (req, res) => {
@@ -232,6 +358,7 @@ app.get("/api/user/:id", async (req, res) => {
     const user = await Users.findById(req.params.id).select(
       "name email date address"
     );
+    console.log(user);
     if (!user) return res.status(404).json({ error: "User not found" });
     res.json(user);
   } catch (err) {
@@ -294,11 +421,97 @@ app.get("/yourorders", authMiddleware, async (req, res) => {
   }
 });
 
+
+//old code 
+//to create order for user
+// app.post("/create-order", authMiddleware, async (req, res) => {
+//   try {
+//     const userId = req.user.id;
+//     const cartItems = req.body;
+
+
+//     const numericProductIds = Object.keys(cartItems).map((id) =>
+//       parseInt(id, 10)
+//     ); // Convert to numbers
+
+//     // Fetch the correct MongoDB _id using the numeric id
+//     const products = await Product.find(
+//       { id: { $in: numericProductIds } },
+//       "_id id new_price"
+//     );
+
+//     const productIdMap = new Map(
+//       products.map((product) => [product.id, product._id.toString()])
+//     ); // Map id to _id
+
+//     const orderItems = numericProductIds.map((id) => ({
+//       productId: productIdMap.get(id), // Get _id from map
+//       quantity: cartItems[id],
+//     }));
+
+//     // Calculate total price correctly
+//     const totalAmount = orderItems.reduce((total, item) => {
+//       const price =
+//         products.find((p) => p._id.toString() === item.productId)?.new_price ||
+//         0;
+//       return total + price * item.quantity;
+//     }, 0);
+
+//     const newOrder = new Order({
+//       userId,
+//       items: orderItems,
+//       totalAmount,
+//       status: "Processing",
+//     });
+
+//     await newOrder.save();
+//     // console.log("Order saved successfully:", newOrder);
+//     res.json({ success: true, order: newOrder });
+//   } catch (error) {
+//     console.error("Error creating order:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Failed to create order", error: error.message });
+//   }
+// });
+
+
+// new code 
 //to create order for user
 app.post("/create-order", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
     const cartItems = req.body;
+    console.log("User ID:", userId);
+
+    const user = await Users.findById(userId);
+    // const testaccount = await nodemailer.createTestAccount();
+    // console.log(testaccount);
+    // const transporter = nodemailer.createTransport({
+    //     host: testaccount.smtp.host,
+    //     port: testaccount.smtp.port,
+    //     secure: testaccount.smtp.secure,
+    //     auth:{
+    //       user: testaccount.user,
+    //       pass: testaccount.pass,
+    //     }
+    // })
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+    // const info = await transporter.sendMail({
+    //     from: 'no-reply@elitecart.com',
+    //     to: user.email,
+    //     subject: 'Order Confirmation',
+    //     text: 'Your order has been confirmed',
+    //     html: '<b>Your order has been confirmed!</b>',
+    // })
 
 
     const numericProductIds = Object.keys(cartItems).map((id) =>
@@ -310,6 +523,9 @@ app.post("/create-order", authMiddleware, async (req, res) => {
       { id: { $in: numericProductIds } },
       "_id id new_price"
     );
+
+   
+   
 
     const productIdMap = new Map(
       products.map((product) => [product.id, product._id.toString()])
@@ -336,8 +552,66 @@ app.post("/create-order", authMiddleware, async (req, res) => {
     });
 
     await newOrder.save();
-    // console.log("Order saved successfully:", newOrder);
+    console.log("Order saved successfully:", newOrder);
+   
+
+    const orderSummaryHTML = orderItems.map(item => {
+      const product = products.find(p => p._id.toString() === item.productId);
+      if (!product) return '';
+   
+      return `
+        <li style="margin-bottom: 10px;">
+         
+          <span style="margin-left: 10px;">
+           
+            Quantity: ${item.quantity}<br/>
+            Price: ₹${product.new_price}
+          </span>
+        </li>
+      `;
+    }).join('');
+
+    const deliveryDate = new Date();
+    deliveryDate.setDate(deliveryDate.getDate() + 5); // 5-day estimate
+    const deliveryDateStr = deliveryDate.toDateString();
+
+
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: Arial, sans-serif; color: #333;">
+    <h2>Thank you for your order with <span style="color:#4CAF50;">EliteCart</span>!</h2>
+    <p style="color:#4CAF50;" >Hi ${user.name}</p>
+    <p>Your order <strong>#${newOrder._id.toString().slice(-6)}</strong> has been received and is currently <strong>processing</strong>.</p>
+    <p>Thank you for your order. We will send a confirmation when your order ships. Your estimated delivery date is indicated below</p>
+
+    <h3>Order Summary</h3>
+    <ul>
+      ${orderSummaryHTML}
+    </ul>
+
+    <p><strong>Total Amount:</strong> ₹${newOrder.totalAmount}</p>
+    <p><strong>Estimated Delivery:</strong> ${deliveryDateStr}</p>
+    <p>You will receive another email when your order has been shipped.</p>
+
+    <p style="margin-top: 30px;">Thanks again,<br>The EliteCart Team</p>
+    </body>
+    </html>
+    `;
+
+    const sendEmail = async () => {
+      const info = await transporter.sendMail({
+        from: "EliteCart <philosophile.jayesh@gmail.com>",
+        to: user.email,
+        subject: "Thanks for your order! Your EliteCart Order is confirmed",
+        html: htmlContent,
+      });
+      console.log("Message sent: %s", info.messageId);
+    };
+    await sendEmail();
     res.json({ success: true, order: newOrder });
+    // res.json({ success: true });
   } catch (error) {
     console.error("Error creating order:", error);
     res
@@ -345,6 +619,8 @@ app.post("/create-order", authMiddleware, async (req, res) => {
       .json({ message: "Failed to create order", error: error.message });
   }
 });
+//new code ends
+
 
 app.get("/admin/orders", async (req, res) => {
   try {
