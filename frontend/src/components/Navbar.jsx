@@ -14,7 +14,6 @@ import coupon_logo from '../assets/coupon_logo.png';
 
 const Navbar = () => {
   const { searchQuery, setSearchQuery, getTotalCartItems } = useContext(ShopContext);
-  // const [menu, setMenu] = useState("Shop");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef();

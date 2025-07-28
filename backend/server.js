@@ -238,8 +238,6 @@ app.post("/signup", async (req, res) => {
   };
   const token = jwt.sign(data, "secret_ecom");
   res.json({ success: true, token, userId: user.id });
-
-  // res.json({ success: true, isAdmin: user.isAdmin });
 });
 
  
@@ -251,7 +249,6 @@ app.post("/login", async (req, res) => {
     // console.log(req.body.password);
     // console.log(user.password)
     var passCompare =await bcrypt.compare(req.body.password, user.password);
-    // const passCompare = req.body.password === user.password;
     if (passCompare) {
       const data = {
         user: {
@@ -295,17 +292,12 @@ app.post("/adminsignup", async (req, res) => {
   };
   const token = jwt.sign(data, "secret_admin");
   res.json({ success: true, token });
-
-  // res.json({ success: true});
 });
 
 //Admin login
 app.post("/adminlogin", async (req, res) => {
   let admin = await Admins.findOne({ email: req.body.email });
   if (admin) {
-    // console.log(req.body.password);
-    // console.log(user.password)
-    // const passCompare = await bcrypt.compare(req.body.password, user.password);
     const passCompare = req.body.password === admin.password;
     if (passCompare) {
       const data = {
@@ -482,20 +474,9 @@ app.post("/create-order", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
     const cartItems = req.body;
-    console.log("User ID:", userId);
+    // console.log("User ID:", userId);
 
     const user = await Users.findById(userId);
-    // const testaccount = await nodemailer.createTestAccount();
-    // console.log(testaccount);
-    // const transporter = nodemailer.createTransport({
-    //     host: testaccount.smtp.host,
-    //     port: testaccount.smtp.port,
-    //     secure: testaccount.smtp.secure,
-    //     auth:{
-    //       user: testaccount.user,
-    //       pass: testaccount.pass,
-    //     }
-    // })
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
@@ -505,15 +486,6 @@ app.post("/create-order", authMiddleware, async (req, res) => {
         pass: process.env.EMAIL_PASS,
       },
     });
-    // const info = await transporter.sendMail({
-    //     from: 'no-reply@elitecart.com',
-    //     to: user.email,
-    //     subject: 'Order Confirmation',
-    //     text: 'Your order has been confirmed',
-    //     html: '<b>Your order has been confirmed!</b>',
-    // })
-
-
     const numericProductIds = Object.keys(cartItems).map((id) =>
       parseInt(id, 10)
     ); // Convert to numbers
@@ -523,9 +495,6 @@ app.post("/create-order", authMiddleware, async (req, res) => {
       { id: { $in: numericProductIds } },
       "_id id new_price"
     );
-
-   
-   
 
     const productIdMap = new Map(
       products.map((product) => [product.id, product._id.toString()])
@@ -574,9 +543,6 @@ app.post("/create-order", authMiddleware, async (req, res) => {
     const deliveryDate = new Date();
     deliveryDate.setDate(deliveryDate.getDate() + 5); // 5-day estimate
     const deliveryDateStr = deliveryDate.toDateString();
-
-
-
     const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -607,11 +573,10 @@ app.post("/create-order", authMiddleware, async (req, res) => {
         subject: "Thanks for your order! Your EliteCart Order is confirmed",
         html: htmlContent,
       });
-      console.log("Message sent: %s", info.messageId);
+      // console.log("Message sent: %s", info.messageId);
     };
     await sendEmail();
     res.json({ success: true, order: newOrder });
-    // res.json({ success: true });
   } catch (error) {
     console.error("Error creating order:", error);
     res

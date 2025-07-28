@@ -40,7 +40,7 @@ const AddProduct = () => {
 
         if(responseData.success){
             product.image = responseData.image_url;
-            console.log(product);
+            // console.log(product);
             await fetch('http://localhost:3000/addproduct', {
                 method: 'POST',
                 headers:{

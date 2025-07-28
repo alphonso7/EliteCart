@@ -78,12 +78,6 @@ const Checkout = () => {
     // setCartItems(savedCart);
   }, []);
 
-  //   useEffect(() => {
-  //     await axios.get(`http://localhost:3000/api/user/${userId}`)
-  //         .then(res => setUser(res.data))
-  //         .catch(err => console.error('Error fetching user:', err));
-  // }, [userId]);
-
   useEffect(() => {
 
     const fetchUser = async () => {
@@ -100,9 +94,7 @@ const Checkout = () => {
     fetchUser();
 
   }, [userId]);
-  // console.log(user);
-
-  // const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  
   return (
     <>
       <nav className="shadow-md w-full sticky top-0 z-50 bg-blue-400">

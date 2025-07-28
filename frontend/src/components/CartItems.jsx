@@ -36,10 +36,6 @@ const CartItems = () => {
             Object.entries(filteredCartItems)// Convert keys to numbers
         );
 
-        // console.log("✅ Sending filtered cart items:", filteredCartItems);
-        // console.log(formattedCartItems)
-        // console.log("🛒 Final Cart Data Being Sent:", JSON.stringify(formattedCartItems, null, 2));
-
         navigate("/checkout");
 
     };

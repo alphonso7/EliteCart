@@ -18,8 +18,6 @@ const getDefaultCart = ()=>{
 const ShopContextProvider = (props) =>{
 
     const [searchQuery, setSearchQuery] = useState("");
-
-
     const [all_products, setAllProduct] = useState([]);
 
     const [cartItems, setcartItems] = useState(()=>{
@@ -57,7 +55,7 @@ const ShopContextProvider = (props) =>{
             .then((resp) => resp.json())
             .then((data) => {
                 setAllProduct(data);
-                console.log(data)
+                // console.log(data)
             })
             .catch((err) => console.error("Fetch error:", err));
     }, []);
@@ -81,10 +79,6 @@ const ShopContextProvider = (props) =>{
       
 
     const addToCart = (itemId, selectedSize, selectedQuantity = 1) =>{
-        // console.log(itemId);
-        // console.log(selectedSize);
-        // console.log(typeof(itemId));
-        // setcartItems((prev) => ({...prev, [itemId]:(prev[itemId] || 0)+1}));
         setcartItems((prev) => ({
             ...prev,
             [itemId]: (prev[itemId] || 0) + (selectedQuantity || 1),
@@ -110,11 +104,7 @@ const ShopContextProvider = (props) =>{
     }
     const getTotalCartAmount = () => {
         let totalAmount = 0;
-        
-        // console.log("🔍 Available Product IDs:", all_products.map(p => p.id));
 
-    
-        // console.log(cartItems)
         for (const item in cartItems) {
             if (Number(cartItems[item]) > 0) {
                 let productInfo = all_products.find((e) => {return Number(item) === Number(e.id)});
