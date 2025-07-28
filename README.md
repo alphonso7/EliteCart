@@ -30,22 +30,22 @@ Note: Admin panel is not deployed yet.
 ### Screenshots
 
 - Login Page
-![EliteCart Banner](public\Loginpage.jpg)
+![EliteCart Banner](public/Loginpage.jpg)
 
 - Home page
-![EliteCart Banner](public\Homepage.jpg)
+![EliteCart Banner](public/Homepage.jpg)
 
 - Men Category
-![EliteCart Banner](public\Mencategory.jpg)
+![EliteCart Banner](public/Mencategory.jpg)
 
 - Checkout page
-![EliteCart Banner](public\Checkout.jpg)
+![EliteCart Banner](public/Checkout.jpg)
 
 - Product display page
-![EliteCart Banner](public\Productdisplay.jpg)
+![EliteCart Banner](public/Productdisplay.jpg)
 
 - Cart Page
-![EliteCart Banner](public\Cartpage.jpg)
+![EliteCart Banner](public/Cartpage.jpg)
 
 
 ### EliteCart Setup guide 
