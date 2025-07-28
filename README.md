@@ -2,7 +2,7 @@
 
 EliteCart is a fully functional fashion E-Commerce platform built with the MERN stack (MongoDB, Express, React, Node). It offers recommendations based on color similarity and k-means clustering, with core shopping features like cart, orders, profile management, and admin control.
 
-🔗 Live Repo: [EliteCart GitHub](https://elitecart-frontend.netlify.app/)
+🔗 Live Repo deployed on Render: [EliteCart GitHub](https://elitecart-frontend.onrender.com)
 
 --------------------
 ### 🚀 **Features**: 
@@ -26,6 +26,27 @@ EliteCart is a fully functional fashion E-Commerce platform built with the MERN 
 - 📧 Order confirmation via Email (Using nodemailer).
 
 Note: Admin panel is not deployed yet. 
+
+### Screenshots
+
+- Login Page
+![EliteCart Banner](public\Loginpage.jpg)
+
+- Home page
+![EliteCart Banner](public\Homepage.jpg)
+
+- Men Category
+![EliteCart Banner](public\Mencategory.jpg)
+
+- Checkout page
+![EliteCart Banner](public\Checkout.jpg)
+
+- Product display page
+![EliteCart Banner](public\Productdisplay.jpg)
+
+- Cart Page
+![EliteCart Banner](public\Cartpage.jpg)
+
 
 ### EliteCart Setup guide 
 
@@ -64,11 +85,10 @@ npm run dev
   - Update the .env file inside backend
   ```
     MONGO_URI=mongodb+srv://<your-db-uri>
-    JWT_SECRET=your_jwt_secret
-    SMTP_USER=your_smtp_email@gmail.com
-    SMTP_PASS=your_smtp_password
-    FRONTEND_BASE_URL=http://localhost:5000
-    ADMIN_BASE_URL=http://localhost:4000
+    PORT=3000
+    EMAIL=your_smtp_email@gmail.com
+    EMAIL_PASS=your_smtp_password
+    BASE_URL=http://localhost:3000
 
   ```
 
