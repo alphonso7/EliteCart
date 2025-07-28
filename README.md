@@ -94,7 +94,10 @@ npm run dev
 
 
 ### 📄 License
-This project is under the MIT License.
+This project is licensed under the AGPL-3.0 License.  
+You may use, modify, or distribute the code for non-commercial purposes only.  
+Any commercial use or deployment must disclose source code and changes made.
+
 
 ### Open for collaborations and edits
 Contact on linked in (Link in the profile).
